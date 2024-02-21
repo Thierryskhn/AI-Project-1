@@ -1,0 +1,1 @@
+This is our first start on the project, choosing chinese checkers
