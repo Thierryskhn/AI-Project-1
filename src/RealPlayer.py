@@ -1,5 +1,4 @@
-from Player import Player
-from CCBoard import CCBoard, Board
+from Player import Player, Board
 
 class RealPlayer(Player):
     # RealPlayer class is used to represent a real player
