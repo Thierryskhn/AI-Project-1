@@ -38,3 +38,7 @@ def main():
     #Once the game is finished we can print the winner 
     if board.game_finished(list_players)._1 == True:
         print("The winner is: " + board.game_finished(list_players)._2)
+
+
+
+main()

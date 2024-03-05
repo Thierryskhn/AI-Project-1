@@ -8,9 +8,9 @@ class Board:
        self.side_size = 7 #change the size of the board because why not?
        self.zones = self.create_zones(self.num_players,self.side_size)
 
-        #TODO: arranger comment bien copier cette liste
-       self.list_players = list_players #copy it better because it does not work this way
-       self.list_pieces = list_pieces #copy it better because it does not work this way
+        #TODO: arranger comment bien copier cette liste 'normalement c fait)
+       self.list_players = list(list_players) #copy it better because it does not work this way
+       self.list_pieces = list(list_pieces) #copy it better because it does not work this way
 
 
     #create each zones with the correct cooridnates
