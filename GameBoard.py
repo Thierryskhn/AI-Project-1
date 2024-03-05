@@ -1,7 +1,5 @@
 import math 
 
-
-
 class Board: 
     zones = dict
     def __init__(self,side_size,num_players, list_players, list_pieces):
@@ -85,7 +83,6 @@ class Board:
         for p in neighbor_pieces:
             p_coords = p.get_coords()
             #if the space after the piece is empty, then we can jump over it
-            
             #substract to get the perfect aligned space 
             #TODO : add z dimension if done
             x = p_coords._1 - piece_x
@@ -108,9 +105,7 @@ class Board:
                             y = k.get_coords()._2 - p.get_coords()._2
                             piece_coords_to_check = (k.get_coords()._1 + x, k.get_coords()._2 + y)
                             if self.coords_in_boards(piece_coords_to_check) and piece_coords_to_check not in [(pc.get_coords()) for pc in self.list_pieces]:
-                                legal_moves.append(piece_coords_to_check)  
-            
-        
+                                legal_moves.append(piece_coords_to_check)
         return legal_moves
 
     def game_finished(self, list_players):
@@ -128,3 +123,25 @@ class Board:
                 #Otherwise one player satisified the goal states ! 
                 else:
                     return (True, player)
+                
+
+    def create_all_moves_boards(self, color):
+        #This part of the class takes care of creating all the possible moves for each piece 
+        different_boards_after_moves =  []
+        #We iterate through the pieces of the same color
+        for p in self.list_pieces:
+            if p.color == color:
+                #We iterate through the legal moves of the piece
+                for move in p.legal_moves:
+                    #We create a new board for each move
+                    new_board = self
+                    new_board.move_piece(p, move)
+                    different_boards_after_moves.append(new_board)
+
+        return different_boards_after_moves
+    
+
+    def move_piece(self, piece, move):
+        #This part of the class takes care of moving a piece to a new position
+        piece.set_coords(move)
+        return 
