@@ -48,7 +48,6 @@ class AIPlayer:
         #Computing the legal moves for the piece
         moves = board.legal_moves(piece_to_move)
 
-        
         move = input("Where do you want to move it ?")
         while move not in moves:
             move = input("Where do you want to move it ? (please enter a valid move  in the good format) : ")
