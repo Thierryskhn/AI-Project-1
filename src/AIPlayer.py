@@ -1,37 +1,24 @@
 from Player import Player, Board
-
-import numpy as np
-
+from AlphaBeta import AlphaBeta
+from BoardEval import BoardEval
 
 class AIPlayer(Player):
 
     def __init__(self, color, name, pieces_array, goal_states):
         self.name  = name
         self.color = color
-        #Adding this array to just handle the pieces on te baord 
-
-        #Il faudra arranger comment on assigne a la liste 
-        self.pieces_array = pieces_array
-        self.goal_states = goal_states
-
+        #Adding this array to just handle the pieces on the board 
 
         
     def __str__(self):
         return self.name
 
-    def get_move(self, board: Board):
+    def get_move(self, state: Board):
+        """ Get the move from the player
+        Args:
+            state (Board): The current state of the game
+        """
+        ab = AlphaBeta(3, BoardEval.eval)
+        move = ab.search(self.color, state, 0)
 
-        #Creating the min-max implementation
-        #The AI will be able to calculate the best move to make
-        
-        #Sort the array of piece according to the biggest coords (x, y)
-        self.pieces_array.sort(key=lambda piece: piece.coords[1]**2 + piece.coords[0]**2, reverse=True)
-        
-        #a arranger
-        for piece in self.pieces_array:
-            
-            #Check if the piece can move
-                if piece.can_move():
-                    #Move the piece
-                    piece.move()
-                    break
+        return move[1] # move[1] is the move, move[0] is the board that results from the move

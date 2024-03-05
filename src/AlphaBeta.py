@@ -18,7 +18,12 @@ class AlphaBeta:
             depth (int): The current depth
         """
         v = self.max_value(state, color, float('-inf'), float('inf'), depth)
-        return 
+
+        for move in state[0].create_all_moves_boards(color):
+            if self.eval_fn(move, color) == v:
+                return move
+
+        print("AI Error: No move found")
 
     def max_value(self, color, state, alpha, beta, depth):
         """ Return the value of a max node
@@ -30,11 +35,11 @@ class AlphaBeta:
             depth (int): The current depth
         """
         if self.cutoff_test(state, depth):
-            return self.eval_fn(state)
+            return self.eval_fn(state, color)
 
         v = float('-inf')
-        for action in state.create_all_moves_boards(color):
-            v = max(v, self.min_value(color, action, alpha, beta, depth + 1))
+        for move in state[0].create_all_moves_boards(color):
+            v = max(v, self.min_value(color, move, alpha, beta, depth + 1))
 
             if v >= beta:
                 return v
@@ -53,11 +58,11 @@ class AlphaBeta:
             depth (int): The current depth
         """
         if self.cutoff_test(state, depth):
-            return self.eval_fn(state)
+            return self.eval_fn(state, color)
 
         v = float('inf')
-        for action in state.create_all_moves_boards(color):
-            v = min(v, self.max_value(color, action, alpha, beta, depth + 1))
+        for move in state[0].create_all_moves_boards(color):
+            v = min(v, self.max_value(color, move, alpha, beta, depth + 1))
 
             if v <= alpha:
                 return v
