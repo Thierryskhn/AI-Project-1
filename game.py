@@ -1,71 +1,40 @@
 import numpy as np
+import random
 
+from GameBoard import Board
 
-# --------------------- Whole Chinese Checkers game class -------------------- #
-class ChineseCheckers:
+def main():
 
-    def __init__(self, num_players):
-        self.board = Board()
-        self.num_players = num_players
-
-
-# -------------------------------- Board Class ------------------------------- #
-class Board:
-
-    def __init__(self, width, height):
-        self.width = width
-        self.height = height
-
-
-# ------------------------------- Vertex class ------------------------------- #
-class Piece:
-
-    def __init__(self, player, x, y):
-        self.x = x
-        self.y = y 
-        self.player = player 
-
-    def getplayer(self):
-        return self.player
+    colors = random.shuffle(["FF0000", "00ff00", "0000FF", "FFFF00"])
+    num_players = 0
     
-    def getCoords(self):
-        return (self.x, self.y)
-    
-    def setCoords(self, newX, newY):
-        self.x = newX
-        self.y = newY
+    #We ask the number of players and check if it is valid
+    while num_players not in (2,3):
+        num_players = int(input("Enter the number of players (2 or 3): "))
+        if(num_players not in (2,3)):
+            print("The number of players is not valid")
 
-# ------------------------------- Player Class ------------------------------- #
+    list_players = []
+    #We ask the type of player for each player and instanciate the correct class
+    for i in range(num_players):
+        type = None
+        while(type.lower not in ("human", "ai")):
+            type = input("Enter the type of player" + str(i+1) + " (AI or Human): ")
+            if(type.lower not in ("human", "ai")):
+                print("The type of player is not valid")
+        if type.lower == "ai":
+            list_players.append(AIPlayer(i, colors[i]))
+        else:
+            list_players.append(RealPlayer(i, colors[i]))
 
-class Player:
-    
-    def __init__(self, id, score, moves):
-        self.id = id
-        self.moves = moves
-        self.score = score
+    #Instanciate the board with the correct parameters
+    board = Board(num_players, list_players, []) # le dernier élément du board est censé être une liste de pièces, mais on ne l'a pas encore implémenté/ discuté
 
-    def __str__(self) -> str:
-        return f"Player {self.id} has {self.score} points and {self.moves} moves left"
-    
-    def get_score(self):
-        return self.score
-    
-    def add_score(self):
-        self.score += 1 
-
-
-"""
-_BOARD_STR = \
-222200000
-222000000
-220000000
-200000000
-000000000
-000000001
-000000011
-000000111
-000001111
-
-FULL_BOARD = np.array([[ int(c) for c in r] for r in _BOARD_STR.splitlines()], dtype=np.int8)
-
-print(FULL_BOARD)"""
+    #While the game is not finished, we loop through the players and ask them to play
+    while board.game_finsished(list_players) == False:
+        for player in list_players:
+            move = player.get_move(board)
+            board.move_piece(move)
+    #Once the game is finished we can print the winner 
+    if board.game_finished(list_players)._1 == True:
+        print("The winner is: " + board.game_finished(list_players)._2)
