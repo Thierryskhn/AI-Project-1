@@ -2,10 +2,10 @@ import math
 
 class Board: 
     zones = dict
-    def __init__(self,side_size,num_players, list_players, list_pieces):
+    def __init__(self, num_players, list_players, list_pieces):
        if num_players in (2,3,4,6) : self.num_players = num_players 
        else: self.num_players = 2 #number of players by default
-       self.side_size = side_size #change the size of the board because why not?
+       self.side_size = 7 #change the size of the board because why not?
        self.zones = self.create_zones(self.num_players,self.side_size)
 
         #TODO: arranger comment bien copier cette liste
@@ -44,7 +44,7 @@ class Board:
                 zones[0].append((x,y))
 
     def coords_in_boards(self,coords):
-        #TODO : Check if it works well
+        #TODO : SOLVE : IT IS NOT WORKING !!!
         x,y = coords
         return -self.side_size <= x <= self.side_size and -self.side_size <= y <= self.side_size and abs(x+y) <= self.side_size
 
@@ -119,7 +119,7 @@ class Board:
             for piece in player.pieces_array:
                 #if the piece does not satisfy the goal state, just break
                 if piece.coords not in player.goal_states:
-                    break
+                    return False
                 #Otherwise one player satisified the goal states ! 
                 else:
                     return (True, player)
@@ -136,7 +136,7 @@ class Board:
                     #We create a new board for each move
                     new_board = self
                     new_board.move_piece(p, move)
-                    different_boards_after_moves.append(new_board)
+                    different_boards_after_moves.append((new_board, (p, move)))
 
         return different_boards_after_moves
     
