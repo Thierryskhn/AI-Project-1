@@ -19,6 +19,6 @@ class AIPlayer(Player):
             state (Board): The current state of the game
         """
         ab = AlphaBeta(3, BoardEval.eval)
-        move = ab.search(self.color, state, 0)
+        move = ab.search(self.color, state)
 
         return move[1] # move[1] is the move, move[0] is the board that results from the move

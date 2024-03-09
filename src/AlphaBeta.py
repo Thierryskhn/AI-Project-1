@@ -9,20 +9,21 @@ class AlphaBeta:
         self.cutoff = cutoff
         self.eval_fn = evaluation_function
 
-    def search(self, color, state, depth):
+    def search(self, color, state):
         """ Search the game state and return the best move
         Args:
             color (str): The color of the player to move
             state (Board): The current state of the game
             depth (int): The current depth
         """
-        v = self.max_value(state, color, float('-inf'), float('inf'), depth)
+        v = self.max_value(state, color, float('-inf'), float('inf'), 0)
 
         for move in state[0].create_all_moves_boards(color):
             if self.eval_fn(move, color) == v:
                 return move
 
         print("AI Error: No move found")
+        return None
 
     def max_value(self, color, state, alpha, beta, depth):
         """ Return the value of a max node
@@ -76,7 +77,7 @@ class AlphaBeta:
             state (Board): The current state of the game
             depth (int): The current depth
         """
-        if depth > self.cutoff or state.game_finished()[0]:
+        if depth >= self.cutoff or state[0].game_finished()[0]:
             return True
         
         return False
