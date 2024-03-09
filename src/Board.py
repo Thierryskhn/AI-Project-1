@@ -1,5 +1,6 @@
 import math 
 from src.Piece import Piece 
+
 class Board:
 
     def __init__(self, num_players, list_players):
@@ -72,6 +73,7 @@ class Board:
             if self.is_adjacent_piece((piece_x, piece_y, piece_z), p_coords):
                 neighbor_pieces.append(p)
         
+        #TODO : add the z dimension if done
         #Adding the neighboring spaces that are not filled up by the adjacent pieces
         coords_to_check = [(piece_x+1, piece_y-1, piece_z), (piece_x+1, piece_y, piece_z-1), (piece_x, piece_y+1, piece_z-1),
                         (piece_x-1, piece_y+1, piece_z), (piece_x-1, piece_y, piece_z+1), (piece_x, piece_y-1, piece_z+1)]
@@ -85,11 +87,11 @@ class Board:
             p_coords = p.get_coords()
             #if the space after the piece is empty, then we can jump over it
             #substract to get the perfect aligned space 
-            x = p_coords._1 - piece_x
-            y = p_coords._2 - piece_y 
-            z = p_coords._3 - piece_z
+            x = p_coords[0] - piece_x
+            y = p_coords[1] - piece_y 
+            z = p_coords[2] - piece_z
 
-            piece_coords_to_check = (p_coords._1 + x, p_coords._2 + y, p_coords._3 + z)
+            piece_coords_to_check = (p_coords[0] + x, p_coords[1] + y, p_coords[2] + z)
             if self.coords_in_boards(piece_coords_to_check) and piece_coords_to_check not in [(pc.get_coords()) for pc in self.list_pieces]:
                 legal_moves.append(piece_coords_to_check)
 
@@ -102,10 +104,10 @@ class Board:
                     for k in self.list_pieces:
                         if(self.is_adjacent_piece(p.get_coords(), k.get_coords())):
                             #TODO add z dimension if done
-                            x = k.get_coords()._1 - p.get_coords()._1
-                            y = k.get_coords()._2 - p.get_coords()._2
-                            z = k.get_coords()._3 - p.get_coords()._3
-                            piece_coords_to_check = (k.get_coords()._1 + x, k.get_coords()._2 + y , k.get_coords()._3 + z)
+                            x = k.get_coords()[0] - p.get_coords()[0]
+                            y = k.get_coords()[1] - p.get_coords()[1]
+                            z = k.get_coords()[2] - p.get_coords()[2]
+                            piece_coords_to_check = (k.get_coords()[0] + x, k.get_coords()[1] + y , k.get_coords()[2] + z)
                             if self.coords_in_boards(piece_coords_to_check) and piece_coords_to_check not in [(pc.get_coords()) for pc in self.list_pieces]:
                                 legal_moves.append(piece_coords_to_check)
         return legal_moves
@@ -118,11 +120,12 @@ class Board:
             #iterating through the pieces of each player
             for piece in player.pieces_array:
                 #if the piece does not satisfy the goal state, just break
-                if piece.coords not in player.goal_states:
+                if piece.get_coords() not in player.goal_states:
                     return False
                 #Otherwise one player satisified the goal states ! 
                 else:
-                    return (True, player)
+                    print("The winner is: player" + player.get_id())
+                    return True
                 
 
     def create_all_moves_boards(self, color):
