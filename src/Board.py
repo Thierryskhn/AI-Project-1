@@ -72,7 +72,6 @@ class Board:
             if self.is_adjacent_piece((piece_x, piece_y, piece_z), p_coords):
                 neighbor_pieces.append(p)
         
-        #TODO : add the z dimension if done
         #Adding the neighboring spaces that are not filled up by the adjacent pieces
         coords_to_check = [(piece_x+1, piece_y-1, piece_z), (piece_x+1, piece_y, piece_z-1), (piece_x, piece_y+1, piece_z-1),
                         (piece_x-1, piece_y+1, piece_z), (piece_x-1, piece_y, piece_z+1), (piece_x, piece_y-1, piece_z+1)]
