@@ -2,9 +2,10 @@ import random
 from Board import Board
 from AIPlayer import AIPlayer
 from RealPlayer import RealPlayer
-def main():
 
-    colors = random.shuffle(["FF0000", "00ff00", "0000FF", "FFFF00"])
+def main():
+    colors = ["FF0000", "00FF00", "0000FF", "FFFF00", "FF00FF", "00FFFF"]
+    random.shuffle(colors)
     num_players = 0
     
     #We ask the number of players and check if it is valid
@@ -16,12 +17,14 @@ def main():
     list_players = []
     #We ask the type of player for each player and instanciate the correct class
     for i in range(num_players):
-        type = None
-        while(type.lower not in ("human", "ai")):
+        type = ""
+        while(type.lower() not in ("human", "ai")):
             type = input("Enter the type of player" + str(i+1) + " (AI or Human): ")
-            if(type.lower not in ("human", "ai")):
+
+            if(type.lower() not in ("human", "ai")):
                 print("The type of player is not valid")
-        if type.lower == "ai":
+                
+        if type.lower() == "ai":
             list_players.append(AIPlayer(i, colors[i]))
         else:
             list_players.append(RealPlayer(i, colors[i]))
@@ -30,7 +33,7 @@ def main():
     board = Board(num_players, list_players) 
 
     #While the game is not finished, we loop through the players and ask them to play
-    while board.game_finsished(list_players) == False:
+    while board.game_finished(list_players) == False:
         for player in list_players:
             move = player.get_move(board)
             board.move_piece(move)
