@@ -9,37 +9,37 @@ class AlphaBeta:
         self.cutoff = cutoff
         self.eval_fn = evaluation_function
 
-    def search(self, color, state):
+    def search(self, player, state):
         """ Search the game state and return the best move
         Args:
-            color (str): The color of the player to move
+            player (str): The current player
             state (Board): The current state of the game
             depth (int): The current depth
         """
-        v = self.max_value(state, color, float('-inf'), float('inf'), 0)
+        v = self.max_value(state, player, float('-inf'), float('inf'), 0)
 
-        for move in state[0].create_all_moves_boards(color):
-            if self.eval_fn(move, color) == v:
+        for move in state[0].create_all_moves_boards(player.color):
+            if self.eval_fn(move, player) == v:
                 return move
 
         print("AI Error: No move found")
         return None
 
-    def max_value(self, color, state, alpha, beta, depth):
+    def max_value(self, player, state, alpha, beta, depth):
         """ Return the value of a max node
         Args:
-            color (str): The color of the player to move
+            player (str): The current player
             state (Board): The current state of the game
             alpha (int): The current alpha value
             beta (int): The current beta value
             depth (int): The current depth
         """
         if self.cutoff_test(state, depth):
-            return self.eval_fn(state, color)
+            return self.eval_fn(state, player)
 
         v = float('-inf')
-        for move in state[0].create_all_moves_boards(color):
-            v = max(v, self.min_value(color, move, alpha, beta, depth + 1))
+        for move in state[0].create_all_moves_boards(player.color):
+            v = max(v, self.min_value(player, move, alpha, beta, depth + 1))
 
             if v >= beta:
                 return v
@@ -48,21 +48,21 @@ class AlphaBeta:
         
         return v
 
-    def min_value(self, color, state, alpha, beta, depth):
+    def min_value(self, player, state, alpha, beta, depth):
         """ Return the value of a min node
         Args:
-            color (str): The color of the player to move
+            player (str): The current player
             state (Board): The current state of the game
             alpha (int): The current alpha value
             beta (int): The current beta value
             depth (int): The current depth
         """
         if self.cutoff_test(state, depth):
-            return self.eval_fn(state, color)
+            return self.eval_fn(state, player)
 
         v = float('inf')
-        for move in state[0].create_all_moves_boards(color):
-            v = min(v, self.max_value(color, move, alpha, beta, depth + 1))
+        for move in state[0].create_all_moves_boards(player.color):
+            v = min(v, self.max_value(player, move, alpha, beta, depth + 1))
 
             if v <= alpha:
                 return v

@@ -1,6 +1,6 @@
 from Player import Player, Board
 from AlphaBeta import AlphaBeta
-from BoardEval import BoardEval
+from BoardEval import eval
 
 class AIPlayer(Player):
 
@@ -18,7 +18,7 @@ class AIPlayer(Player):
         Args:
             state (Board): The current state of the game
         """
-        ab = AlphaBeta(3, BoardEval.eval)
-        move = ab.search(self.color, state)
+        ab = AlphaBeta(3, eval)
+        move = ab.search(self, state)
 
         return move[1] # move[1] is the move, move[0] is the board that results from the move
