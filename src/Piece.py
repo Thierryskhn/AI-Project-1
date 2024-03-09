@@ -14,5 +14,3 @@ class Piece:
     
     def set_coords(self, coords):
         self.coords = coords
-
-    
