@@ -3,15 +3,13 @@ from AlphaBeta import AlphaBeta
 from BoardEval import eval
 
 class AIPlayer(Player):
-
-    def __init__(self, color, name, pieces_array, goal_states):
-        self.name  = name
-        self.color = color
-        #Adding this array to just handle the pieces on the board 
-
-        
-    def __str__(self):
-        return self.name
+    def __init__(self, id: int, color: str):
+        """ Initialize the AIPlayer class
+        Args:
+            id (int): player id
+            color (str): player color
+        """
+        super().__init__(id, color)
 
     def get_move(self, state: Board):
         """ Get the move from the player

@@ -1,15 +1,20 @@
 from Player import Player, Board
 
 class RealPlayer(Player):
-    # RealPlayer class is used to represent a real player
-    # id (int): player id
-    # color (str): hex color
     def __init__(self, id: int, color: str):
+        """ Initialize the RealPlayer class
+        Args:
+            id (int): player id
+            color (str): player color
+        """
         super().__init__(id, color)
 
-
-    # Gets the coordinates input from the player
     def get_coordinates_input(self, board: Board, message: str):
+        """ Get the coordinates input from the player
+        Args:
+            board (Board): The current state of the game
+            message (str): The message to display to the player
+        """
         coordinates = None
         while coordinates == None:
             move = input(message).strip().split(' ')
@@ -25,8 +30,11 @@ class RealPlayer(Player):
 
         return coordinates
 
-    # Gets the move from the player
     def get_move(self, board: Board):
+        """ Get the move from the player
+        Args:
+            board (Board): The current state of the game
+        """
         valid = False
 
         while not valid:
