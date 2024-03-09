@@ -1,6 +1,5 @@
 class AlphaBeta:
 
-
     def __init__(self, cutoff, evaluation_function):
         """ Creates a new AlphaBeta search object.
         Args:
