@@ -27,7 +27,7 @@ def main():
             list_players.append(RealPlayer(i, colors[i]))
 
     #Instanciate the board with the correct parameters
-    board = Board(num_players, list_players) # le dernier élément du board est censé être une liste de pièces, mais on ne l'a pas encore implémenté/ discuté
+    board = Board(num_players, list_players) 
 
     #While the game is not finished, we loop through the players and ask them to play
     while board.game_finsished(list_players) == False:
