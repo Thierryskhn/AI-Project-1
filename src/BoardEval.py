@@ -1,7 +1,8 @@
-MAX_DISTANCE = 100
+MAX_DISTANCE = 100 # TODO change this value
+MIN_TOTAL_DISTANCE = 0 # TODO change this value
 
 def eval(move, player):
-    """ Return the evaluation of a board
+    """ Return the score of a given move
     Args:
         move ((Board, (Piece, newCoords))): The board to evaluate
     """
@@ -10,7 +11,7 @@ def eval(move, player):
 
     goal = average_coordinates(board.end_zones[player])
 
-    return MAX_DISTANCE - sum_distance_to_goal(player_pieces, goal)
+    return MAX_DISTANCE - (sum_distance_to_goal(player_pieces, goal) -  MIN_TOTAL_DISTANCE)
 
 def sum_distance_to_goal(pieces, goal):
     """ Return the sum of the distance to the goal
