@@ -4,7 +4,7 @@ class Board:
         self.num_players = num_players
         self.zones = self.create_zones(self.num_players)
         self.pieces = []
-        self.list_players = list_players
+        self.list_players = list_players.copy
         self.coordinates = [self.zones[0],self.zones[1],self.zones[2],self.zones[3],self.zones[4],self.zones[5],self.zones[6]]
         self.start_zones = {list_players[0]:self.zones[1],list_players[1]:self.zones[4]} if num_players==2 else {list_players[0]:self.zones[1],list_players[1]:self.zones[3],list_players[2]:self.zones[5]} #remplacer les nombres par les players?
         self.end_zones = {list_players[0]:self.zones[4], list_players[1]:self.zones[1]} if num_players == 2 else {list_players[0]:self.zones[4], list_players[1]:self.zones[6],list_players[2]:self.zones[2]}
@@ -47,9 +47,3 @@ class Board:
                 zones[0].append((q,r,-q-r))
 
         return zones
-
-
-            
-
-
-
