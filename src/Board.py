@@ -1,13 +1,13 @@
 import math 
-from src.Piece import Piece 
+from Piece import Piece 
 
 class Board:
 
     def __init__(self, num_players, list_players):
         self.num_players = num_players
-        self.zones = self.create_zones(self.num_players)
         self.pieces = []
         self.list_players = list_players.copy()
+        self.zones = self.create_zones(self.num_players)
         self.coordinates = [self.zones[0],self.zones[1],self.zones[2],self.zones[3],self.zones[4],self.zones[5],self.zones[6]]
         self.start_zones = {list_players[0]:self.zones[1],list_players[1]:self.zones[4]} if num_players==2 else {list_players[0]:self.zones[1],list_players[1]:self.zones[3],list_players[2]:self.zones[5]} #remplacer les nombres par les players?
         self.end_zones = {list_players[0]:self.zones[4], list_players[1]:self.zones[1]} if num_players == 2 else {list_players[0]:self.zones[4], list_players[1]:self.zones[6],list_players[2]:self.zones[2]}
