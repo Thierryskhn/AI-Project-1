@@ -59,6 +59,13 @@ class Board:
         return (piece_coords._1 - coords_to_check._1) **2 +(piece_coords._2 - coords_to_check._2)**2 + (piece_coords._3 - coords_to_check._3)**2 == 2
 
     def legal_moves(self, piece):
+        """
+        Computes a list of legal moves for a piece
+        
+        Args:
+            Piece (Piece): the piece for which we want to compute the legal moves
+        """
+
         #list containing the legal moves for a specific piece
         legal_moves = []
         #First get the piece's coordinates
@@ -113,9 +120,11 @@ class Board:
         return legal_moves
 
     def game_finished(self, list_players):
-        #This part of the class takes care of checking 
-        #if one of players satisfied all the goal states and hence won the game
-        #iterating through the players list
+        """
+        Function that checks if the game is finished and returns the winner
+        Args:
+            list_players (list(Player)): list of players in the game
+        """
         for player in list_players:
             #iterating through the pieces of each player
             for piece in [p for p in self.pieces if p.color == player.color]:
@@ -129,11 +138,17 @@ class Board:
                 
 
     def create_all_moves_boards(self, color):
-        #This part of the class takes care of creating all the possible moves for each piece 
+        """
+        Function that creates all the possible boards after a move for a specific player (color)
+
+        Args:
+            color (str): the color of the player for which we want to create the boards
+        """
+        
         different_boards_after_moves =  []
         #We iterate through the pieces of the same color
         for p in self.pieces:
-            if p.color == color:
+            if p.get_color() == color:
                 #We iterate through the legal moves of the piece
                 for move in self.legal_moves(p):
                     #We create a new board for each move
@@ -145,7 +160,14 @@ class Board:
     
 
     def move_piece(self, piece, move):
-        #This part of the class takes care of moving a piece to a new position
+        """
+        Function that moves a piece to a new position
+
+        Args:
+            piece (Piece): the piece to move
+            move (tuple of ints): the new position of the piece in coords
+
+        """
         piece.set_coords(move)
         return 
 

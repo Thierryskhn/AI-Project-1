@@ -14,3 +14,6 @@ class Piece:
     
     def set_coords(self, coords):
         self.coords = coords
+
+    def get_color(self):
+        return self.color
