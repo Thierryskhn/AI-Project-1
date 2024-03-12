@@ -155,7 +155,7 @@ class Board:
                 for move in self.legal_moves(p):
                     #We create a new board for each move
                     new_board = self.copy()
-                    new_board.move_piece(p, move)
+                    #new_board.move_piece(p, move)
                     different_boards_after_moves.append((new_board, (p, move)))
 
         return different_boards_after_moves
@@ -188,6 +188,10 @@ class Board:
         return new_board
     
     def print_board(self):
+        """
+        Function that prints the board
+        """
+
         side_size = 8
         pieces_coordinates =  [piece.get_coords() for piece in self.pieces]
 
