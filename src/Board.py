@@ -55,7 +55,7 @@ class Board:
         return any(coords in zone for zone in self.coordinates)
 
     def is_adjacent_piece(self, piece_coords, coords_to_check):
-        return abs(piece_coords[0] - coords_to_check[0], piece_coords[1] - coords_to_check[1], piece_coords[2] - coords_to_check[2]) == 1
+        return abs(piece_coords[0] - coords_to_check[0]) + abs(piece_coords[1] - coords_to_check[1]) + abs(piece_coords[2] - coords_to_check[2]) == 2
 
     def legal_moves(self, piece):
         """
@@ -76,7 +76,6 @@ class Board:
         neighbor_pieces = []
         for p in self.pieces:
             p_coords = p.get_coords()
-            print(p.get_coords())
             #compute the euclidean distance of the piece to the current piece 
             if self.is_adjacent_piece((piece_x, piece_y, piece_z), p_coords):
                 neighbor_pieces.append(p)
