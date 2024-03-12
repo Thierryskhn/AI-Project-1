@@ -18,11 +18,12 @@ class AlphaBeta:
         """
         v = self.max_value(player, state, float('-inf'), float('inf'), 0)
 
-        for move in state.create_all_moves_boards(player.color):
+        all_moves = state.create_all_moves_boards(player.color)
+        for move in all_moves:
             if self.eval_fn(player, move) == v:
                 return move
 
-        print("AI Error: No move found")
+        print("AlphaBeta: No move found")
         return None
 
     def max_value(self, player, state, alpha, beta, depth):

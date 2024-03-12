@@ -29,11 +29,8 @@ def distance_to_goal(piece, goal_pos):
     """
     piece_coords = piece.get_coords()
 
-    c1 = abs(piece_coords[0] - goal_pos[0])
-    c2 = abs(piece_coords[1] - goal_pos[1])
-    c3 = abs(piece_coords[2] - goal_pos[2])
-
-    return (c1 + c2 + c3) / 2 # The division by 2 is to get the distance in hex coordinates
+    # The division by 2 is to get the distance in hex coordinates
+    return abs(piece_coords[0] - goal_pos[0], piece_coords[1] - goal_pos[1], piece_coords[2] - goal_pos[2]) / 2
 
 def average_coordinates(coords):
     """ Return the average coordinates

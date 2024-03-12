@@ -55,7 +55,7 @@ class Board:
         return any(coords in zone for zone in self.coordinates)
 
     def is_adjacent_piece(self, piece_coords, coords_to_check):
-        return (piece_coords[0] - coords_to_check[0]) **2 +(piece_coords[1] - coords_to_check[1])**2 + (piece_coords[2] - coords_to_check[2])**2 == 2
+        return abs(piece_coords[0] - coords_to_check[0], piece_coords[1] - coords_to_check[1], piece_coords[2] - coords_to_check[2]) == 1
 
     def legal_moves(self, piece):
         """
