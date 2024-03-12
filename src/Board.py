@@ -52,10 +52,12 @@ class Board:
         return zones
 
     def coords_in_boards(self,coords):
-        return coords in self.coordinates
-
+        return any(coords in zone for zone in self.coordinates)
 
     def is_adjacent_piece(self, piece_coords, coords_to_check):
+        print("piece coords 0 ", piece_coords[0])
+        print("piece coords 1 ", piece_coords[1])
+        print("piece coords 2 ", piece_coords[2])
         return (piece_coords[0] - coords_to_check[0]) **2 +(piece_coords[1] - coords_to_check[1])**2 + (piece_coords[2] - coords_to_check[2])**2 == 2
 
     def legal_moves(self, piece):
@@ -79,12 +81,12 @@ class Board:
             #compute the euclidean distance of the piece to the current piece 
             if self.is_adjacent_piece((piece_x, piece_y, piece_z), p_coords):
                 neighbor_pieces.append(p)
-        
-        #TODO : add the z dimension if done
+
         #Adding the neighboring spaces that are not filled up by the adjacent pieces
         coords_to_check = [(piece_x+1, piece_y-1, piece_z), (piece_x+1, piece_y, piece_z-1), (piece_x, piece_y+1, piece_z-1),
                         (piece_x-1, piece_y+1, piece_z), (piece_x-1, piece_y, piece_z+1), (piece_x, piece_y-1, piece_z+1)]
         for coords in coords_to_check:
+            print("coords in coords_to_check", coords, self.coords_in_boards(coords))
             if self.coords_in_boards(coords) and coords not in [(p.get_coords()) for p in neighbor_pieces]:
                 legal_moves.append(coords)
         #Now we have to append the spaces that can be added with jumps   
@@ -99,7 +101,7 @@ class Board:
             z = p_coords[2] - piece_z
 
             piece_coords_to_check = (p_coords[0] + x, p_coords[1] + y, p_coords[2] + z)
-            if self.coords_in_boards(piece_coords_to_check) and piece_coords_to_check not in [(pc.get_coords()) for pc in self.list_pieces]:
+            if self.coords_in_boards(piece_coords_to_check) and piece_coords_to_check not in [(pc.get_coords()) for pc in self.pieces]:
                 legal_moves.append(piece_coords_to_check)
 
         #TODO maybe this loop won't work / have a problem
@@ -115,7 +117,7 @@ class Board:
                             y = k.get_coords()[1] - p.get_coords()[1]
                             z = k.get_coords()[2] - p.get_coords()[2]
                             piece_coords_to_check = (k.get_coords()[0] + x, k.get_coords()[1] + y , k.get_coords()[2] + z)
-                            if self.coords_in_boards(piece_coords_to_check) and piece_coords_to_check not in [(pc.get_coords()) for pc in self.list_pieces]:
+                            if self.coords_in_boards(piece_coords_to_check) and piece_coords_to_check not in [(pc.get_coords()) for pc in self.pieces]:
                                 legal_moves.append(piece_coords_to_check)
         return legal_moves
 
