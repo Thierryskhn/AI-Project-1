@@ -1,7 +1,9 @@
 from Player import Player, Board
 from AlphaBeta import AlphaBeta
 from BoardEval import eval
-import time
+from time import sleep
+
+AI_SLEEP_TIME = 1.5
 
 class AIPlayer(Player):
     def __init__(self, id: int, color: str):
@@ -18,11 +20,15 @@ class AIPlayer(Player):
             state (Board): The current state of the game
         """
 
-        print(f"player {self.id} is thinking...")
+        sleep(AI_SLEEP_TIME)
+
+        print(f"Player {self.id} is thinking...")
 
         ab = AlphaBeta(3, eval)
         move = ab.search(self, state)
 
-        time.sleep(2)
+        sleep(AI_SLEEP_TIME)
+
+        print(f"Player {self.id} has played!")
 
         return move[1] # move[1] is the move, move[0] is the board that results from the move

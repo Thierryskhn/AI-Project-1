@@ -151,7 +151,7 @@ class Board:
         for p in self.pieces:
             if p.get_color() == color:
                 #We iterate through the legal moves of the piece
-                print(self.legal_moves(p))
+                # TODO print(self.legal_moves(p))
                 for move in self.legal_moves(p):
                     #We create a new board for each move
                     new_board = self.copy()
@@ -186,3 +186,27 @@ class Board:
         new_board.pieces = copy.deepcopy(self.pieces)
 
         return new_board
+    
+    def print_board(self):
+        side_size = 8
+        pieces_coordinates =  [piece.get_coords() for piece in self.pieces]
+
+        print()
+
+        for y in range(2*side_size+1):
+            for x in range(3*side_size+1):
+                if x%2 == y%2:
+                    q = int((x+y-20)/2) #x =2*q+r+12
+                    r = 8-y 
+                    coords = (q,r,-q-r)
+                    if not self.coords_in_boards(coords):
+                        print(" ",end="")
+                    elif not coords in pieces_coordinates: 
+                        print("*",end="")
+                    else:
+                        p = self.pieces[pieces_coordinates.index(coords)]
+                        print(p,end="") #use ansi coding for color 
+                else: print(" ", end="")
+            print()
+
+        print()

@@ -7,7 +7,7 @@ class Piece:
         self.id = id
 
     def __str__(self):
-        return self.name
+        return self.color.value + str(self.id) + '\x1b[0m'
     
     def get_coords(self):
         return self.coords

@@ -58,8 +58,8 @@ class RealPlayer(Player):
         valid = False
 
         while not valid:
-            piece = self.get_id_input(board, f"Player {self.id}: Enter the id of the piece you want to move : ")
-            dest = self.get_coordinates_input(board, f"Player {self.id}: Enter the place you want to move the piece to ('q r s'): ")
+            piece = self.get_id_input(board, f"Player {self.id}: Enter the piece you want to move : ")
+            dest = self.get_coordinates_input(board, f"Player {self.id}: Enter the place you want to move the piece to ('q r s', see src/Board.png): ")
 
             piece = [p for p in board.pieces if p.id == piece and p.color == self.color][0]
 
@@ -67,5 +67,7 @@ class RealPlayer(Player):
 
             if not valid:
                 print("Invalid move, try again")
+
+        print(f"Player {self.id} has played!")
 
         return (piece, dest)
