@@ -21,9 +21,10 @@ class Board:
         for q in range(-side_size, 0):
             for r in range(side_size+1, side_size -q + 1):
                     zones[0].append((q,r,-q-r))
-                    self.pieces.append(Piece(self.list_players[0].id,self.list_players[0].color,(q,r,-q-r)) )
+                    self.add_piece(0, (q,r,-q-r))
                     zones[4].append((-q,-r,q+r))
-                    if num_players == 2 : self.pieces.append(Piece(self.list_players[1].id,self.list_players[1].color,(-q,-r,q+r)) )
+                    if num_players == 2 : 
+                        self.add_piece(1, (-q,-r,q+r))
 
 
 
@@ -32,14 +33,16 @@ class Board:
             for r in range(side_size - q+ 1, side_size + 1):
                 zones[2].append((q,r,-q-r))
                 zones[5].append((-q,-r,q+r))
-                if num_players == 3 : self.pieces.append(Piece(self.list_players[2].id,self.list_players[2].color,(-q,-r,q+r)) )
+                if num_players == 3 : 
+                    self.add_piece(2, (-q,-r,q+r))
                 
 
         # start and end zone player 3
         for q in range(side_size+1, 2*side_size+1):
             for r in range(-side_size, side_size -q + 1):
                 zones[3].append((q,r,-q-r))
-                if num_players == 3 : self.pieces.append(Piece(self.list_players[1].id,self.list_players[1].color,(q,r,-q-r)) )
+                if num_players == 3 : 
+                    self.add_piece(1, (q,r,-q-r))
                 zones[6].append((-q,-r,q+r))
 
         #neutral zone ie zone 0
@@ -67,7 +70,7 @@ class Board:
 
         #Then we have to search if there is any adjacent piece blocking the current piece
         neighbor_pieces = []
-        for p in self.list_pieces:
+        for p in self.pieces:
             p_coords = p.get_coords()
             #compute the euclidean distance of the piece to the current piece 
             if self.is_adjacent_piece((piece_x, piece_y, piece_z), p_coords):
@@ -101,7 +104,7 @@ class Board:
             for p in neighbor_pieces:
                 #Now we want to check the possible spaces where we can go after jumping over a piece
                 if not(self.is_adjacent_piece((piece_x, piece_y), p.get_coords())):
-                    for k in self.list_pieces:
+                    for k in self.pieces:
                         if(self.is_adjacent_piece(p.get_coords(), k.get_coords())):
                             #TODO add z dimension if done
                             x = k.get_coords()[0] - p.get_coords()[0]
@@ -118,9 +121,9 @@ class Board:
         #iterating through the players list
         for player in list_players:
             #iterating through the pieces of each player
-            for piece in player.pieces_array:
+            for piece in [p for p in self.pieces if p.color == player.color]:
                 #if the piece does not satisfy the goal state, just break
-                if piece.get_coords() not in player.goal_states:
+                if piece.get_coords() not in self.end_zones[player]:
                     return False
                 #Otherwise one player satisified the goal states ! 
                 else:
@@ -132,7 +135,7 @@ class Board:
         #This part of the class takes care of creating all the possible moves for each piece 
         different_boards_after_moves =  []
         #We iterate through the pieces of the same color
-        for p in self.list_pieces:
+        for p in self.pieces:
             if p.color == color:
                 #We iterate through the legal moves of the piece
                 for move in self.legal_moves(p):
@@ -148,3 +151,8 @@ class Board:
         #This part of the class takes care of moving a piece to a new position
         piece.set_coords(move)
         return 
+
+    def add_piece(self, player_nr, coords):
+        id = len([p for p in self.pieces if p.color == self.list_players[player_nr].color])
+
+        self.pieces.append(Piece(self.list_players[player_nr].id,self.list_players[player_nr].color,coords, id))

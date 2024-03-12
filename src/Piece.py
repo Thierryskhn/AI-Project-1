@@ -1,10 +1,10 @@
 class Piece:
 
-    def __init__(self, name, color, coords):
+    def __init__(self, name, color, coords, id):
         self.color  = color
         self.coords = coords
         self.name = name
-
+        self.id = id
 
     def __str__(self):
         return self.name
