@@ -1,8 +1,6 @@
-import numpy as np
-import random
-
-from GameBoard import Board
-
+import random  
+from Board import Board
+from src.Player import Player
 def main():
 
     colors = random.shuffle(["FF0000", "00ff00", "0000FF", "FFFF00"])
@@ -28,7 +26,7 @@ def main():
             list_players.append(RealPlayer(i, colors[i]))
 
     #Instanciate the board with the correct parameters
-    board = Board(num_players, list_players, []) # le dernier élément du board est censé être une liste de pièces, mais on ne l'a pas encore implémenté/ discuté
+    board = Board(num_players, list_players) # le dernier élément du board est censé être une liste de pièces, mais on ne l'a pas encore implémenté/ discuté
 
     #While the game is not finished, we loop through the players and ask them to play
     while board.game_finsished(list_players) == False:
@@ -36,9 +34,7 @@ def main():
             move = player.get_move(board)
             board.move_piece(move)
     #Once the game is finished we can print the winner 
-    if board.game_finished(list_players)._1 == True:
+    if board.game_finished(list_players) == True:
         print("The winner is: " + board.game_finished(list_players)._2)
-
-
 
 main()
