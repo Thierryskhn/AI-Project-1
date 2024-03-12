@@ -25,9 +25,6 @@ class Board:
                     zones[4].append((-q,-r,q+r))
                     if num_players == 2 : 
                         self.add_piece(1, (-q,-r,q+r))
-
-
-
         
         for q in range(0, side_size + 1):
             for r in range(side_size - q+ 1, side_size + 1):
