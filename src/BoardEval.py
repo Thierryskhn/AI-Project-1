@@ -1,7 +1,7 @@
 MAX_DISTANCE = 100 # TODO change this value
 MIN_TOTAL_DISTANCE = 0 # TODO change this value
 
-def eval(move, player):
+def eval(player, move):
     """ Return the score of a given move
     Args:
         move ((Board, (Piece, newCoords))): The board to evaluate

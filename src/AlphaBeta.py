@@ -16,10 +16,10 @@ class AlphaBeta:
             state (Board): The current state of the game
             depth (int): The current depth
         """
-        v = self.max_value(state, player, float('-inf'), float('inf'), 0)
+        v = self.max_value(player, state, float('-inf'), float('inf'), 0)
 
-        for move in state[0].create_all_moves_boards(player.color):
-            if self.eval_fn(move, player) == v:
+        for move in state.create_all_moves_boards(player.color):
+            if self.eval_fn(player, move) == v:
                 return move
 
         print("AI Error: No move found")
@@ -35,11 +35,11 @@ class AlphaBeta:
             depth (int): The current depth
         """
         if self.cutoff_test(state, depth):
-            return self.eval_fn(state, player)
+            return self.eval_fn(player, state)
 
         v = float('-inf')
-        for move in state[0].create_all_moves_boards(player.color):
-            v = max(v, self.min_value(player, move, alpha, beta, depth + 1))
+        for move in state.create_all_moves_boards(player.color):
+            v = max(v, self.min_value(player, move[0], alpha, beta, depth + 1))
 
             if v >= beta:
                 return v
@@ -58,11 +58,11 @@ class AlphaBeta:
             depth (int): The current depth
         """
         if self.cutoff_test(state, depth):
-            return self.eval_fn(state, player)
+            return self.eval_fn(player, state)
 
         v = float('inf')
-        for move in state[0].create_all_moves_boards(player.color):
-            v = min(v, self.max_value(player, move, alpha, beta, depth + 1))
+        for move in state.create_all_moves_boards(player.color):
+            v = min(v, self.max_value(player, move[0], alpha, beta, depth + 1))
 
             if v <= alpha:
                 return v
@@ -77,7 +77,7 @@ class AlphaBeta:
             state (Board): The current state of the game
             depth (int): The current depth
         """
-        if depth >= self.cutoff or state[0].game_finished()[0]:
+        if depth >= self.cutoff or state.game_finished(state.list_players):
             return True
         
         return False

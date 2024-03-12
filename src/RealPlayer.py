@@ -18,11 +18,11 @@ class RealPlayer(Player):
         coordinates = None
         while coordinates == None:
             move = input(message).strip().split(' ')
-            if len(move) != 2 or not move[0].isnumeric() or not move[1].isnumeric():
+            if len(move) != 3 or not all(coord.isnumeric() for coord in move):
                 print("Invalid input, try again")
                 continue
 
-            if not board.is_valid_position(int(move[0]), int(move[1])):
+            if not board.coords_in_boards((int(move[0]), int(move[1]), int(move[2]))):
                 print("Invalid position, try again")
                 continue
 
@@ -45,7 +45,7 @@ class RealPlayer(Player):
                 continue
             piece_id = int(piece_id)
             if not piece_id in [p.id for p in board.pieces if p.color == self.color]:
-                print("Invalid piece, try again")
+                print("Invalid piece id, try again")
                 piece_id = None
 
         return piece_id
@@ -59,11 +59,13 @@ class RealPlayer(Player):
 
         while not valid:
             piece = self.get_id_input(board, f"Player {self.id}: Enter the id of the piece you want to move : ")
-            dest = self.get_coordinates_input(board, f"Player {self.id}: Enter the place you want to move the piece to ('x y z'): ")
+            dest = self.get_coordinates_input(board, f"Player {self.id}: Enter the place you want to move the piece to ('q r s'): ")
 
             piece = [p for p in board.pieces if p.id == piece and p.color == self.color][0]
-            valid = dest in board.legal_moves(piece)
 
-            valid = board.coords_in_boards(self.id, piece, dest)
+            valid = dest in board.legal_moves(piece) and board.coords_in_boards(dest)
+
+            if not valid:
+                print("Invalid move, try again")
 
         return (piece, dest)
