@@ -1,15 +1,14 @@
 MAX_DISTANCE = 100 # TODO change this value
 MIN_TOTAL_DISTANCE = 0 # TODO change this value
 
-def eval(player, move):
+def eval(player, state):
     """ Return the score of a given move
     Args:
-        move ((Board, (Piece, newCoords))): The board to evaluate
+        state (Board): The state to evaluate
     """
-    board = move[0]
-    player_pieces = [piece for piece in board.pieces if piece.color == player.color]
+    player_pieces = [piece for piece in state.pieces if piece.color == player.color]
 
-    goal = average_coordinates(board.end_zones[player])
+    goal = average_coordinates(state.end_zones[player])
 
     return MAX_DISTANCE - (sum_distance_to_goal(player_pieces, goal) -  MIN_TOTAL_DISTANCE)
 
