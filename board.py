@@ -64,7 +64,7 @@ def print_board(self):
                     print("*",end="")
                 else:
                     p = self.pieces[pieces_coordinates.index(coords)]
-                    print(p.get_color()+str(p)+'\x1b[0m',end="") #use ansi coding for color 
+                    print(p.get_color().value+str(p)+'\x1b[0m',end="") #use ansi coding for color 
             else: print(" ", end="")
         print()
     
