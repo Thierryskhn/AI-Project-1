@@ -103,7 +103,6 @@ class Board:
             if self.coords_in_boards(piece_coords_to_check) and piece_coords_to_check not in [(pc.get_coords()) for pc in self.pieces]:
                 legal_moves.append(piece_coords_to_check)
 
-        #TODO maybe this loop won't work / have a problem
         while len(legal_moves) != legal_moves_length:
             legal_moves_length = len(legal_moves)
             for p in neighbor_pieces:
@@ -111,7 +110,6 @@ class Board:
                 if not(self.is_adjacent_piece((piece_x, piece_y, piece_z), p.get_coords())):
                     for k in self.pieces:
                         if(self.is_adjacent_piece(p.get_coords(), k.get_coords())):
-                            #TODO add z dimension if done
                             x = k.get_coords()[0] - p.get_coords()[0]
                             y = k.get_coords()[1] - p.get_coords()[1]
                             z = k.get_coords()[2] - p.get_coords()[2]
