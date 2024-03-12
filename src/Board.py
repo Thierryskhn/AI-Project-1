@@ -55,9 +55,6 @@ class Board:
         return any(coords in zone for zone in self.coordinates)
 
     def is_adjacent_piece(self, piece_coords, coords_to_check):
-        print("piece coords 0 ", piece_coords[0])
-        print("piece coords 1 ", piece_coords[1])
-        print("piece coords 2 ", piece_coords[2])
         return (piece_coords[0] - coords_to_check[0]) **2 +(piece_coords[1] - coords_to_check[1])**2 + (piece_coords[2] - coords_to_check[2])**2 == 2
 
     def legal_moves(self, piece):
@@ -70,6 +67,7 @@ class Board:
 
         #list containing the legal moves for a specific piece
         legal_moves = []
+
         #First get the piece's coordinates
         piece_x, piece_y, piece_z = piece.get_coords()
         legal_moves_length = 0
@@ -78,6 +76,7 @@ class Board:
         neighbor_pieces = []
         for p in self.pieces:
             p_coords = p.get_coords()
+            print(p.get_coords())
             #compute the euclidean distance of the piece to the current piece 
             if self.is_adjacent_piece((piece_x, piece_y, piece_z), p_coords):
                 neighbor_pieces.append(p)
@@ -86,7 +85,7 @@ class Board:
         coords_to_check = [(piece_x+1, piece_y-1, piece_z), (piece_x+1, piece_y, piece_z-1), (piece_x, piece_y+1, piece_z-1),
                         (piece_x-1, piece_y+1, piece_z), (piece_x-1, piece_y, piece_z+1), (piece_x, piece_y-1, piece_z+1)]
         for coords in coords_to_check:
-            print("coords in coords_to_check", coords, self.coords_in_boards(coords))
+
             if self.coords_in_boards(coords) and coords not in [(p.get_coords()) for p in neighbor_pieces]:
                 legal_moves.append(coords)
         #Now we have to append the spaces that can be added with jumps   
@@ -109,7 +108,7 @@ class Board:
             legal_moves_length = len(legal_moves)
             for p in neighbor_pieces:
                 #Now we want to check the possible spaces where we can go after jumping over a piece
-                if not(self.is_adjacent_piece((piece_x, piece_y), p.get_coords())):
+                if not(self.is_adjacent_piece((piece_x, piece_y, piece_z), p.get_coords())):
                     for k in self.pieces:
                         if(self.is_adjacent_piece(p.get_coords(), k.get_coords())):
                             #TODO add z dimension if done

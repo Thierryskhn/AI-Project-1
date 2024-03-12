@@ -16,4 +16,7 @@ class Piece:
         self.coords = coords
 
     def get_color(self):
+        """
+        Function getting the color of the piece
+        """
         return self.color
