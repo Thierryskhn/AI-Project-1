@@ -36,7 +36,7 @@ def main():
     while board.game_finished(list_players) == False:
         for player in list_players:
             move = player.get_move(board)
-            board.move_piece(move)
+            board.move_piece(move[0], move[1])
     #Once the game is finished we can print the winner 
     if board.game_finished(list_players) == True:
         print("The winner is: " + board.game_finished(list_players)._2)

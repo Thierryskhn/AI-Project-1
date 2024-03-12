@@ -20,3 +20,9 @@ class Piece:
         Function getting the color of the piece
         """
         return self.color
+    
+    def copy(self):
+        """
+        Function that returns a copy of the piece
+        """
+        return Piece(self.name, self.color, self.coords.copy(), self.id)

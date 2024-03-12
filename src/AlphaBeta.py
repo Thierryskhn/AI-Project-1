@@ -20,6 +20,7 @@ class AlphaBeta:
 
         all_moves = state.create_all_moves_boards(player.color)
         for move in all_moves:
+            print(v, self.eval_fn(player, move[0]))
             if self.eval_fn(player, move[0]) == v:
                 return move
 

@@ -1,5 +1,6 @@
 import math 
 from Piece import Piece 
+import copy
 
 class Board:
 
@@ -20,7 +21,7 @@ class Board:
         #start and end zones player 1
         for q in range(-side_size, 0):
             for r in range(side_size+1, side_size -q + 1):
-                    zones[0].append((q,r,-q-r))
+                    zones[1].append((q,r,-q-r))
                     self.add_piece(0, (q,r,-q-r))
                     zones[4].append((-q,-r,q+r))
                     if num_players == 2 : 
@@ -150,9 +151,10 @@ class Board:
         for p in self.pieces:
             if p.get_color() == color:
                 #We iterate through the legal moves of the piece
+                print(self.legal_moves(p))
                 for move in self.legal_moves(p):
                     #We create a new board for each move
-                    new_board = self
+                    new_board = self.copy()
                     new_board.move_piece(p, move)
                     different_boards_after_moves.append((new_board, (p, move)))
 
@@ -175,3 +177,12 @@ class Board:
         id = len([p for p in self.pieces if p.color == self.list_players[player_nr].color])
 
         self.pieces.append(Piece(self.list_players[player_nr].id,self.list_players[player_nr].color,coords, id))
+
+    def copy(self):
+        """
+        Function that returns a copy of the board
+        """
+        new_board = Board(self.num_players, self.list_players)
+        new_board.pieces = copy.deepcopy(self.pieces)
+
+        return new_board
