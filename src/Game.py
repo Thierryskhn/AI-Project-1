@@ -51,7 +51,8 @@ def main():
     board = Board(num_players, list_players) 
 
     #While the game is not finished, we loop through the players and ask them to play
-    while board.game_finished(list_players) == False:
+    forfeit = None
+    while board.game_finished(list_players) == False and forfeit == None:
         for player in list_players:
 
             print(f"\n{Color.BOLD.value}Current board")
@@ -59,6 +60,11 @@ def main():
             print(f"\n{player.color.value}{Color.BOLD.value}Player {player.id}{Color.END.value}{Color.BOLD.value}'s turn {Color.END.value}")
 
             move = player.get_move(board)
+
+            if move == None:
+                forfeit = player
+                break
+
             board.move_piece(move[0], move[1])
 
             sleep(SLEEP_TIME)
@@ -66,5 +72,7 @@ def main():
     #Once the game is finished we can print the winner 
     if board.game_finished(list_players) == True:
         print("The winner is: " + board.game_finished(list_players)[1])
+    else:
+        print(f"{forfeit.color.value}Player {forfeit.id}{Color.END.value} has forfeited the game")
 
 main()

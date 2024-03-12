@@ -24,7 +24,6 @@ class AlphaBeta:
             if self.eval_fn(player, move[0]) == v:
                 return move
 
-        print("AlphaBeta: No move found")
         return None
 
     def max_value(self, player, state, alpha, beta, depth):

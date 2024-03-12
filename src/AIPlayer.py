@@ -31,4 +31,9 @@ class AIPlayer(Player):
 
         print(f"Player {self.id} has played!")
 
+        # main will handle this case as a forfeit
+        if move == None: 
+            print("AIPlayer: No move found")
+            return None
+
         return move[1] # move[1] is the move, move[0] is the board that results from the move
