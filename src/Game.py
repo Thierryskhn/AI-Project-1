@@ -5,7 +5,7 @@ from RealPlayer import RealPlayer
 from enum import Enum
 from time import sleep
 
-SLEEP_TIME = 1.5
+TURN_SLEEP_TIME = 0 # Time to wait between turns, in seconds (recommended: 1.5)
 
 class Color(Enum):
     RED = '\33[91m'
@@ -55,7 +55,7 @@ def main():
     while board.game_finished(list_players) == False and forfeit == None:
         for player in list_players:
 
-            print(f"\n{Color.BOLD.value}Current board")
+            print(f"\n{Color.BOLD.value}Current board{Color.END.value}")
             board.print_board()
             print(f"\n{player.color.value}{Color.BOLD.value}Player {player.id}{Color.END.value}{Color.BOLD.value}'s turn {Color.END.value}")
 
@@ -65,13 +65,15 @@ def main():
                 forfeit = player
                 break
 
-            board.move_piece(move[0], move[1])
+            piece, dest = move
+            board.move_piece(piece.player, piece.id, dest)
 
-            sleep(SLEEP_TIME)
+            sleep(TURN_SLEEP_TIME)
 
     #Once the game is finished we can print the winner 
     if board.game_finished(list_players) == True:
-        print("The winner is: " + board.game_finished(list_players)[1])
+        winner = board.get_winner(list_players)
+        print(f"\n{winner.color.value}{Color.UNDERLINE.value}{Color.BOLD.value}Player {winner.id} has won the game!{Color.END.value}")
     else:
         print(f"{forfeit.color.value}Player {forfeit.id}{Color.END.value} has forfeited the game")
 

@@ -4,14 +4,24 @@ import copy
 
 class Board:
 
-    def __init__(self, num_players, list_players):
+    def __init__(self, num_players, list_players, *args, **kwargs):
         self.num_players = num_players
         self.pieces = []
         self.list_players = list_players.copy()
-        self.zones = self.create_zones(self.num_players)
-        self.coordinates = [self.zones[0],self.zones[1],self.zones[2],self.zones[3],self.zones[4],self.zones[5],self.zones[6]]
-        self.start_zones = {list_players[0]:self.zones[1],list_players[1]:self.zones[4]} if num_players==2 else {list_players[0]:self.zones[1],list_players[1]:self.zones[3],list_players[2]:self.zones[5]} #remplacer les nombres par les players?
-        self.end_zones = {list_players[0]:self.zones[4], list_players[1]:self.zones[1]} if num_players == 2 else {list_players[0]:self.zones[4], list_players[1]:self.zones[6],list_players[2]:self.zones[2]}
+
+        # if we want to copy the board, avoid creating what we already have that does not change
+        test_args = ['copy', 'zones', 'coordinates', 'start_zones', 'end_zones', 'pieces']
+        if all(arg in kwargs for arg in test_args) and kwargs['copy'] == True:
+            self.pieces = kwargs['pieces']
+            self.zones = kwargs['zones']
+            self.coordinates = kwargs['coordinates']
+            self.start_zones = kwargs['start_zones']
+            self.end_zones = kwargs['end_zones']
+        else :
+            self.zones = self.create_zones(self.num_players)
+            self.coordinates = [self.zones[0],self.zones[1],self.zones[2],self.zones[3],self.zones[4],self.zones[5],self.zones[6]]
+            self.start_zones = {list_players[0]:self.zones[1],list_players[1]:self.zones[4]} if num_players==2 else {list_players[0]:self.zones[1],list_players[1]:self.zones[3],list_players[2]:self.zones[5]} #remplacer les nombres par les players?
+            self.end_zones = {list_players[0]:self.zones[4], list_players[1]:self.zones[1]} if num_players == 2 else {list_players[0]:self.zones[4], list_players[1]:self.zones[6],list_players[2]:self.zones[2]}
 
     #create each zones with the correct coordinates
     def create_zones(self,num_players):
@@ -120,21 +130,33 @@ class Board:
 
     def game_finished(self, list_players):
         """
-        Function that checks if the game is finished and returns the winner
+        Function that checks if the game is finished and returns a boolean
+        Args:
+            list_players (list(Player)): list of players in the game
+        """
+        return self.get_winner(list_players) != None
+        
+
+    def get_winner(self, list_players):
+        """
+        Function that returns the winner of the game, or None if the game is not finished
         Args:
             list_players (list(Player)): list of players in the game
         """
         for player in list_players:
-            #iterating through the pieces of each player
+            # Initially we assume that the goal is reached
+            goal_reached = True
+            # Iterating through the pieces of each player, we check if they are in the goal state
             for piece in [p for p in self.pieces if p.color == player.color]:
-                #if the piece does not satisfy the goal state, just break
+                # If one piece does not satisfy the goal, the game is not finished
                 if piece.get_coords() not in self.end_zones[player]:
-                    return False
-                #Otherwise one player satisified the goal states ! 
-                else:
-                    print("The winner is: player" + player.get_id())
-                    return True
-                
+                    goal_reached = False
+                    break
+            # Otherwise a player satisified the goal states ! 
+            if goal_reached:
+                return player
+        # If no player satisfied the goal states, the game is not finished
+        return None
 
     def create_all_moves_boards(self, color):
         """
@@ -149,17 +171,17 @@ class Board:
         for p in self.pieces:
             if p.get_color() == color:
                 #We iterate through the legal moves of the piece
-                # TODO print(self.legal_moves(p))
                 for move in self.legal_moves(p):
                     #We create a new board for each move
                     new_board = self.copy()
-                    #new_board.move_piece(p, move)
-                    different_boards_after_moves.append((new_board, (p, move)))
+                    new_p = new_board.pieces[self.pieces.index(p)]
+                    new_board.move_piece(new_p.player, new_p.id, move)
+                    different_boards_after_moves.append((new_board, (new_p, move)))
 
         return different_boards_after_moves
     
 
-    def move_piece(self, piece, move):
+    def move_piece(self, player_id, piece_id, dest):
         """
         Function that moves a piece to a new position
 
@@ -168,7 +190,8 @@ class Board:
             move (tuple of ints): the new position of the piece in coords
 
         """
-        piece.set_coords(move)
+        piece = [p for p in self.pieces if p.id == piece_id and p.player == player_id].pop()
+        piece.set_coords(dest)
         return 
 
     def add_piece(self, player_nr, coords):
@@ -180,8 +203,8 @@ class Board:
         """
         Function that returns a copy of the board
         """
-        new_board = Board(self.num_players, self.list_players)
-        new_board.pieces = copy.deepcopy(self.pieces)
+        new_board = Board(self.num_players, self.list_players, copy=True, zones=self.zones, coordinates=self.coordinates, start_zones=self.start_zones, end_zones=self.end_zones)
+        new_board.pieces = [p.copy() for p in self.pieces]
 
         return new_board
     

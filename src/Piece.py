@@ -1,13 +1,13 @@
 class Piece:
 
-    def __init__(self, name, color, coords, id):
+    def __init__(self, player, color, coords, id):
         self.color  = color
         self.coords = coords
-        self.name = name
+        self.player = player
         self.id = id
 
     def __str__(self):
-        return self.color.value + str(self.id) + '\x1b[0m'
+        return self.color.value + str(self.id) + '\033[0m'
     
     def get_coords(self):
         return self.coords
@@ -25,4 +25,4 @@ class Piece:
         """
         Function that returns a copy of the piece
         """
-        return Piece(self.name, self.color, self.coords.copy(), self.id)
+        return Piece(self.player, self.color, self.coords, self.id)

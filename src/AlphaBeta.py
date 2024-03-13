@@ -19,6 +19,8 @@ class AlphaBeta:
         v = self.max_value(player, state, float('-inf'), float('inf'), 0)
 
         all_moves = state.create_all_moves_boards(player.color)
+        #TODO for move in all_moves:
+            #TODO move[0].print_board()
         for move in all_moves:
             # TODO print(v, self.eval_fn(player, move[0]))
             if self.eval_fn(player, move[0]) == v:

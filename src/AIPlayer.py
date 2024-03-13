@@ -3,7 +3,7 @@ from AlphaBeta import AlphaBeta
 from BoardEval import eval
 from time import sleep
 
-AI_SLEEP_TIME = 1.5
+AI_SLEEP_TIME = 0 # Time to wait before playing once the move is found, in seconds (recommended: 2)
 
 class AIPlayer(Player):
     def __init__(self, id: int, color: str):
