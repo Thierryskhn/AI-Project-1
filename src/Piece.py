@@ -1,3 +1,5 @@
+from Color import Color
+
 class Piece:
 
     def __init__(self, player, color, coords, id):
@@ -7,7 +9,7 @@ class Piece:
         self.id = id
 
     def __str__(self):
-        return self.color.value + str(self.id) + '\033[0m'
+        return self.color.value + Color.BOLD.value + str(self.id) + Color.END.value
     
     def get_coords(self):
         return self.coords

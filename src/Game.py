@@ -2,20 +2,10 @@ import random
 from Board import Board
 from AIPlayer import AIPlayer
 from RealPlayer import RealPlayer
-from enum import Enum
+from Color import Color
 from time import sleep
 
 TURN_SLEEP_TIME = 0 # Time to wait between turns, in seconds (recommended: 1.5)
-
-class Color(Enum):
-    RED = '\33[91m'
-    GREEN = '\33[92m'
-    YELLOW = '\33[93m'
-    BLUE = '\33[94m'
-    PURPLE ='\33[95m'
-    BOLD = '\033[1m'
-    UNDERLINE = '\033[4m'
-    END = '\033[0m'
 
 def main():
     colors = [Color.RED, Color.GREEN, Color.YELLOW, Color.BLUE, Color.PURPLE]

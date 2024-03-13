@@ -1,6 +1,5 @@
-import math 
-from Piece import Piece 
-import copy
+from Piece import Piece
+from Color import Color
 
 class Board:
 
@@ -227,10 +226,13 @@ class Board:
                     if not self.coords_in_boards(coords):
                         print(" ",end="")
                     elif not coords in pieces_coordinates: 
-                        print("*",end="")
+                        if coords == (0,0,0):
+                            print(f"⬡",end="")
+                        else:
+                            print("⬢",end="")
                     else:
                         p = self.pieces[pieces_coordinates.index(coords)]
-                        print(p,end="") #use ansi coding for color 
+                        print(p,end="")
                 else: print(" ", end="")
             print()
 
