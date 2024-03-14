@@ -1,3 +1,5 @@
+import math
+
 MAX_DISTANCE = 100 # TODO change this value
 MIN_TOTAL_DISTANCE = 0 # TODO change this value
 
@@ -7,8 +9,8 @@ def eval(player, state):
         state (Board): The state to evaluate
     """
     player_pieces = [piece for piece in state.pieces if piece.color == player.color]
-
-    goal = average_coordinates(state.end_zones[player])
+    
+    goal = max_coordinates(state.end_zones[player])
 
     return MAX_DISTANCE - (sum_distance_to_goal(player_pieces, goal) -  MIN_TOTAL_DISTANCE)
 
@@ -31,13 +33,16 @@ def distance_to_goal(piece, goal_pos):
     # The division by 2 is to get the distance in hex coordinates
     return (abs(piece_coords[0] - goal_pos[0]) + abs(piece_coords[1] - goal_pos[1]) + abs(piece_coords[2] - goal_pos[2]))/ 2
 
-def average_coordinates(coords):
-    """ Return the average coordinates
+def max_coordinates(coords):
+    """ Return the max absolute coordinates
     Args:
         coords (list): The coordinates
     """
-    c1 = sum([coord[0] for coord in coords]) / len(coords)
-    c2 = sum([coord[1] for coord in coords]) / len(coords)
-    c3 = sum([coord[2] for coord in coords]) / len(coords)
-
-    return (c1, c2, c3)
+    #c1 = sum([coord[0] for coord in coords]) / len(coords)
+    #c2 = sum([coord[1] for coord in coords]) / len(coords)
+    #c3 = sum([coord[2] for coord in coords]) / len(coords)
+    max_coord = (0, 0, 0)
+    for coord in coords:
+       if abs(coord[0]) + abs(coord[1]) + abs(coord[2 ]) >= abs(max_coord[0]) + abs(max_coord[1]) + abs(max_coord[2]):
+           max_coord = coord
+    return max_coord
