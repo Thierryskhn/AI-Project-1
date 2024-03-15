@@ -94,7 +94,6 @@ class Board:
         coords_to_check = [(piece_x+1, piece_y-1, piece_z), (piece_x+1, piece_y, piece_z-1), (piece_x, piece_y+1, piece_z-1),
                         (piece_x-1, piece_y+1, piece_z), (piece_x-1, piece_y, piece_z+1), (piece_x, piece_y-1, piece_z+1)]
         for coords in coords_to_check:
-
             if self.coords_in_boards(coords) and coords not in [(p.get_coords()) for p in neighbor_pieces]:
                 legal_moves.append(coords)
         #Now we have to append the spaces that can be added with jumps   

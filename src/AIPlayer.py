@@ -25,7 +25,7 @@ class AIPlayer(Player):
         print(f"Player {self.id} is thinking...")
 
         ab = AlphaBeta(3, eval)
-        move = ab.search(self, state)
+        move = ab.search(self, state, log=False)
 
         sleep(AI_SLEEP_TIME)
 

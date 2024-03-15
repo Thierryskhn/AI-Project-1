@@ -9,26 +9,28 @@ class AlphaBeta:
         self.cutoff = cutoff
         self.eval_fn = evaluation_function
 
-    def search(self, player, state):
+    def search(self, player, state, log=False):
         """ Search the game state and return the best move
         Args:
             player (str): The current player
             state (Board): The current state of the game
             depth (int): The current depth
         """
-        v = self.max_value(player, state, float('-inf'), float('inf'), 0)
+        v = self.max_value(player, state, float('-inf'), float('inf'), 0, log=log)
 
         all_moves = state.create_all_moves_boards(player.color)
+        
+        if log:
+            print(f"Search done for player {player.id}, found {len(all_moves)} moves with best value {v}.")
         #TODO for move in all_moves:
             #TODO move[0].print_board()
         for move in all_moves:
-            # TODO print(v, self.eval_fn(player, move[0]))
             if self.eval_fn(player, move[0]) == v:
                 return move
 
         return None
 
-    def max_value(self, player, state, alpha, beta, depth):
+    def max_value(self, player, state, alpha, beta, depth, log=False):
         """ Return the value of a max node
         Args:
             player (str): The current player
@@ -38,11 +40,14 @@ class AlphaBeta:
             depth (int): The current depth
         """
         if self.cutoff_test(state, depth):
-            return self.eval_fn(player, state)
+            return_value = self.eval_fn(player, state)
+            if log:
+                print(f"Searching : depth={depth}, value={return_value}", end="  \r")
+            return return_value
 
         v = float('-inf')
         for move in state.create_all_moves_boards(player.color):
-            v = max(v, self.min_value(player, move[0], alpha, beta, depth + 1))
+            v = max(v, self.min_value(player, move[0], alpha, beta, depth + 1, log=log))
 
             if v >= beta:
                 return v
@@ -51,7 +56,7 @@ class AlphaBeta:
         
         return v
 
-    def min_value(self, player, state, alpha, beta, depth):
+    def min_value(self, player, state, alpha, beta, depth, log=False):
         """ Return the value of a min node
         Args:
             player (str): The current player
@@ -61,11 +66,14 @@ class AlphaBeta:
             depth (int): The current depth
         """
         if self.cutoff_test(state, depth):
-            return self.eval_fn(player, state)
+            return_value = self.eval_fn(player, state)
+            if log:
+                print(f"Searching : depth={depth}, value={return_value}", end="  \r")
+            return return_value
 
         v = float('inf')
         for move in state.create_all_moves_boards(player.color):
-            v = min(v, self.max_value(player, move[0], alpha, beta, depth + 1))
+            v = min(v, self.max_value(player, move[0], alpha, beta, depth + 1, log=log))
 
             if v <= alpha:
                 return v

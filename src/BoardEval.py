@@ -1,7 +1,8 @@
 import math
 
-MAX_DISTANCE = 100 # TODO change this value
-MIN_TOTAL_DISTANCE = 0 # TODO change this value
+MAX_TOTAL_DISTANCE = 140 # These values were found by testing all positions
+MIN_TOTAL_DISTANCE = 20
+MAX_EVAL = MAX_TOTAL_DISTANCE - MIN_TOTAL_DISTANCE
 
 def eval(player, state):
     """ Return the score of a given move
@@ -12,7 +13,12 @@ def eval(player, state):
     
     goal = max_coordinates(state.end_zones[player])
 
-    return MAX_DISTANCE - (sum_distance_to_goal(player_pieces, goal) -  MIN_TOTAL_DISTANCE)
+    score = MAX_EVAL - (sum_distance_to_goal(player_pieces, goal) -  MIN_TOTAL_DISTANCE)
+
+    if (score < 0):
+        raise ValueError(f"Score is negative: {score}")
+
+    return score
 
 def sum_distance_to_goal(pieces, goal):
     """ Return the sum of the distance to the goal
