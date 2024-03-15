@@ -69,62 +69,63 @@ class Board:
 
     def legal_moves(self, piece):
         """
-        Computes a list of legal moves for a piece
+        Computes a list of legal moves for a given piece
         
         Args:
             Piece (Piece): the piece for which we want to compute the legal moves
         """
-
-        #list containing the legal moves for a specific piece
+        # List containing the legal moves for a specific piece
         legal_moves = []
 
-        #First get the piece's coordinates
-        piece_x, piece_y, piece_z = piece.get_coords()
-        legal_moves_length = 0
+        # First get the piece's coordinates
+        piece_x, piece_y, piece_z = piece.coords
 
-        #Then we have to search if there is any adjacent piece blocking the current piece
-        neighbor_pieces = []
-        for p in self.pieces:
-            p_coords = p.get_coords()
-            #compute the euclidean distance of the piece to the current piece 
-            if self.is_adjacent_piece((piece_x, piece_y, piece_z), p_coords):
-                neighbor_pieces.append(p)
+        # Then we have to search if there is any adjacent piece blocking the current piece
+        neighbour_pieces = self.get_neighbours(piece.coords[0], piece.coords[1], piece.coords[2])
 
-        #Adding the neighboring spaces that are not filled up by the adjacent pieces
+        # Adding the neighbouring spaces that are not filled up by the adjacent pieces
         coords_to_check = [(piece_x+1, piece_y-1, piece_z), (piece_x+1, piece_y, piece_z-1), (piece_x, piece_y+1, piece_z-1),
                         (piece_x-1, piece_y+1, piece_z), (piece_x-1, piece_y, piece_z+1), (piece_x, piece_y-1, piece_z+1)]
         for coords in coords_to_check:
-            if self.coords_in_boards(coords) and coords not in [(p.get_coords()) for p in neighbor_pieces]:
+            if self.coords_in_boards(coords) and coords not in [(p.coords) for p in neighbour_pieces]:
                 legal_moves.append(coords)
-        #Now we have to append the spaces that can be added with jumps   
 
-        #we will potentially put this in another private function 
-        for p in neighbor_pieces:
-            p_coords = p.get_coords()
-            #if the space after the piece is empty, then we can jump over it
-            #substract to get the perfect aligned space 
-            x = p_coords[0] - piece_x
-            y = p_coords[1] - piece_y 
-            z = p_coords[2] - piece_z
+        # Now we have to append the spaces that can be added with jumps   
+        places_to_jump_from = [(piece.coords)]
 
-            piece_coords_to_check = (p_coords[0] + x, p_coords[1] + y, p_coords[2] + z)
-            if self.coords_in_boards(piece_coords_to_check) and piece_coords_to_check not in [(pc.get_coords()) for pc in self.pieces]:
-                legal_moves.append(piece_coords_to_check)
+        # Iterate while there are places that have not been expanded
+        while len(places_to_jump_from) > 0:
+            # Get the first element of the list
+            current_place = places_to_jump_from.pop(0)
 
-        while len(legal_moves) != legal_moves_length:
-            legal_moves_length = len(legal_moves)
-            for p in neighbor_pieces:
-                #Now we want to check the possible spaces where we can go after jumping over a piece
-                if not(self.is_adjacent_piece((piece_x, piece_y, piece_z), p.get_coords())):
-                    for k in self.pieces:
-                        if(self.is_adjacent_piece(p.get_coords(), k.get_coords())):
-                            x = k.get_coords()[0] - p.get_coords()[0]
-                            y = k.get_coords()[1] - p.get_coords()[1]
-                            z = k.get_coords()[2] - p.get_coords()[2]
-                            piece_coords_to_check = (k.get_coords()[0] + x, k.get_coords()[1] + y , k.get_coords()[2] + z)
-                            if self.coords_in_boards(piece_coords_to_check) and piece_coords_to_check not in [(pc.get_coords()) for pc in self.pieces]:
-                                legal_moves.append(piece_coords_to_check)
+            neighbour_pieces = self.get_neighbours(current_place[0], current_place[1], current_place[2])
+            for neighbour_piece in neighbour_pieces:
+                # If the space after the piece is empty, then we can jump over it
+                # Substract to get the perfect aligned space 
+                x = neighbour_piece.coords[0] - current_place[0]
+                y = neighbour_piece.coords[1] - current_place[1] 
+                z = neighbour_piece.coords[2] - current_place[2]
+                
+                piece_coords_to_check = (neighbour_piece.coords[0] + x, neighbour_piece.coords[1] + y, neighbour_piece.coords[2] + z)
+
+                in_board = self.coords_in_boards(piece_coords_to_check)
+                dest_free = piece_coords_to_check not in [(p.coords) for p in self.pieces]
+                not_expanded = piece_coords_to_check not in legal_moves
+
+                if in_board == True and dest_free == True and not_expanded == True:
+                    legal_moves.append(piece_coords_to_check)
+                    places_to_jump_from.append(piece_coords_to_check)
+                    
         return legal_moves
+
+    def get_neighbours(self, piece_x, piece_y, piece_z):
+        neighbour_pieces = []
+        for p in self.pieces:
+            #compute the euclidean distance of the piece to the current piece 
+            if self.is_adjacent_piece((piece_x, piece_y, piece_z), p.coords):
+                neighbour_pieces.append(p)
+
+        return neighbour_pieces
 
     def game_finished(self, list_players):
         """
@@ -147,7 +148,7 @@ class Board:
             # Iterating through the pieces of each player, we check if they are in the goal state
             for piece in [p for p in self.pieces if p.color == player.color]:
                 # If one piece does not satisfy the goal, the game is not finished
-                if piece.get_coords() not in self.end_zones[player]:
+                if piece.coords not in self.end_zones[player]:
                     goal_reached = False
                     break
             # Otherwise a player satisified the goal states ! 
@@ -158,10 +159,13 @@ class Board:
 
     def create_all_moves_boards(self, color):
         """
-        Function that creates all the possible boards after a move for a specific player (color)
+        Function that creates boards for all possible moves from a given state, for a specific player (color)
 
         Args:
             color (str): the color of the player for which we want to create the boards
+
+        Returns:
+            tuple: a list of tuples containing the new boards and the piece-move tuple that led to them
         """
         
         different_boards_after_moves =  []
@@ -186,13 +190,19 @@ class Board:
         Args:
             piece (Piece): the piece to move
             move (tuple of ints): the new position of the piece in coords
-
         """
         piece = [p for p in self.pieces if p.id == piece_id and p.player == player_id].pop()
         piece.set_coords(dest)
         return 
 
     def add_piece(self, player_nr, coords):
+        """
+        Function that adds a piece to the board. Automatically assigns an id to the piece, based on the number of pieces of the same color
+
+        Args:
+            player_nr (int): the player
+            coords (tuple of ints): the coordinates of the piece
+        """
         id = len([p for p in self.pieces if p.color == self.list_players[player_nr].color])
 
         self.pieces.append(Piece(self.list_players[player_nr].id,self.list_players[player_nr].color,coords, id))
@@ -212,7 +222,7 @@ class Board:
         """
 
         side_size = 8
-        pieces_coordinates =  [piece.get_coords() for piece in self.pieces]
+        pieces_coordinates =  [piece.coords for piece in self.pieces]
 
         print()
 

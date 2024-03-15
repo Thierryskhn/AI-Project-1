@@ -4,8 +4,8 @@ MAX_TOTAL_DISTANCE = 140 # These values were found by testing all positions
 MIN_TOTAL_DISTANCE = 20
 MAX_EVAL = MAX_TOTAL_DISTANCE - MIN_TOTAL_DISTANCE
 
-def eval(player, state):
-    """ Return the score of a given move
+def goal_distance_eval(player, state):
+    """ Evalution function based on the distance to the goal
     Args:
         state (Board): The state to evaluate
     """
@@ -34,7 +34,7 @@ def distance_to_goal(piece, goal_pos):
         piece (Piece): The piece to move
         goal_pos (tuple): The goal position
     """
-    piece_coords = piece.get_coords()
+    piece_coords = piece.coords
 
     # The division by 2 is to get the distance in hex coordinates
     return (abs(piece_coords[0] - goal_pos[0]) + abs(piece_coords[1] - goal_pos[1]) + abs(piece_coords[2] - goal_pos[2]))/ 2
@@ -44,11 +44,8 @@ def max_coordinates(coords):
     Args:
         coords (list): The coordinates
     """
-    #c1 = sum([coord[0] for coord in coords]) / len(coords)
-    #c2 = sum([coord[1] for coord in coords]) / len(coords)
-    #c3 = sum([coord[2] for coord in coords]) / len(coords)
     max_coord = (0, 0, 0)
     for coord in coords:
-       if abs(coord[0]) + abs(coord[1]) + abs(coord[2 ]) >= abs(max_coord[0]) + abs(max_coord[1]) + abs(max_coord[2]):
-           max_coord = coord
+        if abs(coord[0]) + abs(coord[1]) + abs(coord[2 ]) >= abs(max_coord[0]) + abs(max_coord[1]) + abs(max_coord[2]):
+            max_coord = coord
     return max_coord

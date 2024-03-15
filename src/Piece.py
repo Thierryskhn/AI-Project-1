@@ -10,10 +10,7 @@ class Piece:
 
     def __str__(self):
         return self.color.value + Color.BOLD.value + str(self.id) + Color.END.value
-    
-    def get_coords(self):
-        return self.coords
-    
+
     def set_coords(self, coords):
         self.coords = coords
 

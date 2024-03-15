@@ -22,8 +22,7 @@ class AlphaBeta:
         
         if log:
             print(f"Search done for player {player.id}, found {len(all_moves)} moves with best value {v}.")
-        #TODO for move in all_moves:
-            #TODO move[0].print_board()
+            
         for move in all_moves:
             if self.eval_fn(player, move[0]) == v:
                 return move

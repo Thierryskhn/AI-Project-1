@@ -1,9 +1,10 @@
 from Player import Player, Board
 from AlphaBeta import AlphaBeta
-from BoardEval import eval
+from BoardEval import goal_distance_eval
 from time import sleep
 
 AI_SLEEP_TIME = 0 # Time to wait before playing once the move is found, in seconds (recommended: 2)
+CUTOFF = 3 # Depth at which to cut off search (recommended: 3)
 
 class AIPlayer(Player):
     def __init__(self, id: int, color: str):
@@ -19,12 +20,9 @@ class AIPlayer(Player):
         Args:
             state (Board): The current state of the game
         """
-
-        sleep(AI_SLEEP_TIME)
-
         print(f"Player {self.id} is thinking...")
 
-        ab = AlphaBeta(3, eval)
+        ab = AlphaBeta(CUTOFF, goal_distance_eval)
         move = ab.search(self, state, log=False)
 
         sleep(AI_SLEEP_TIME)
