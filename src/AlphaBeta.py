@@ -16,23 +16,40 @@ class AlphaBeta:
             state (Board): The current state of the game
             depth (int): The current depth
         """
-        v = self.max_value(player, state, float('-inf'), float('inf'), 0, log=log)
-
-        all_moves = state.create_all_moves_boards(player.color)
+        result = self.initial_max_value(player, state, float('-inf'), float('inf'), 0, log=log)
+        
         
         if log:
-            print(f"Search done for player {player.id}, found {len(all_moves)} moves with best value {v}.")
-            
-        for move in all_moves:
-            if self.eval_fn(player, move[0]) == v:
-                return move
+            print(f"Search done for player {player.id}, found best value {result[0]}.")
 
-        return None
+        return result[1]
+
+    def initial_max_value(self, player, state, alpha, beta, depth, log=False):
+        """ Return the value of a max node, saving the first move. 
+            This function exists to save the first move, as the max_value function does not
+        Args:
+            player (Player): The current player
+            state (Board): The current state of the game
+            alpha (int): The current alpha value
+            beta (int): The current beta value
+            depth (int): The current depth
+        """
+        best_value = float('-inf')
+        best_move = None
+        for move in state.create_all_moves_boards(player.color):
+            v = self.min_value(player, move[0], alpha, beta, depth + 1, log=log)
+
+            if v > best_value:
+                best_value = v
+                best_move = move
+
+        return (best_value, best_move)
+    
 
     def max_value(self, player, state, alpha, beta, depth, log=False):
         """ Return the value of a max node
         Args:
-            player (str): The current player
+            player (Player): The current player
             state (Board): The current state of the game
             alpha (int): The current alpha value
             beta (int): The current beta value
@@ -46,6 +63,7 @@ class AlphaBeta:
 
         v = float('-inf')
         for move in state.create_all_moves_boards(player.color):
+
             v = max(v, self.min_value(player, move[0], alpha, beta, depth + 1, log=log))
 
             if v >= beta:
@@ -58,7 +76,7 @@ class AlphaBeta:
     def min_value(self, player, state, alpha, beta, depth, log=False):
         """ Return the value of a min node
         Args:
-            player (str): The current player
+            player (Player): The current player
             state (Board): The current state of the game
             alpha (int): The current alpha value
             beta (int): The current beta value
@@ -71,7 +89,8 @@ class AlphaBeta:
             return return_value
 
         v = float('inf')
-        for move in state.create_all_moves_boards(player.color):
+        for move in state.create_all_moves_boards(player.opponent.color): # Here the opponent is the one that is going to play
+            
             v = min(v, self.max_value(player, move[0], alpha, beta, depth + 1, log=log))
 
             if v <= alpha:

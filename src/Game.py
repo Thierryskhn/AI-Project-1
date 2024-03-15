@@ -10,35 +10,32 @@ TURN_SLEEP_TIME = 0 # Time to wait between turns, in seconds (recommended: 1.5)
 def main():
     colors = [Color.RED, Color.GREEN, Color.YELLOW, Color.BLUE, Color.PURPLE]
     random.shuffle(colors)
-    num_players = 0
+    num_players = 2
     
-    #We ask the number of players and check if it is valid
-    print()
-    while num_players not in (2,3):
-        num_players = input("Enter the number of players (2 or 3): ").strip()
-        if not (num_players.isnumeric() and int(num_players) in (2,3)):
-            print("The number of players is not valid")
-            continue
-        num_players = int(num_players)
     print()
 
     list_players = []
     #We ask the type of player for each player and instanciate the correct class
     for i in range(num_players):
-        type = ""
-        while(type.lower() not in ("human", "ai")):
-            type = input("Enter the type of player " + str(i+1) + " (AI or Human): ")
+        type = "invalid"
+        while(type.lower() not in ("human", "ai", "")):
+            type = input("Enter the type of player " + str(i+1) + " (AI [default] or Human): ")
 
-            if(type.lower() not in ("human", "ai")):
+            if(type.lower() not in ("human", "ai", "")):
                 print("The type of player is not valid")
                 
-        if type.lower() == "ai":
-            list_players.append(AIPlayer(i+1, colors[i]))
+        if type.lower() == "ai" or type == "":
+            list_players.append(AIPlayer(i+1, colors[i], ))
         else:
             list_players.append(RealPlayer(i+1, colors[i]))
 
+    # As the players are created one after the other, we have to manually set the opponent for each player
+    list_players[0].opponent = list_players[1]
+    list_players[1].opponent = list_players[0]
+
+
     #Instanciate the board with the correct parameters
-    board = Board(num_players, list_players) 
+    board = Board(list_players) 
 
     #While the game is not finished, we loop through the players and ask them to play
     forfeit = None

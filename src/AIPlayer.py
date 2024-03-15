@@ -7,13 +7,13 @@ AI_SLEEP_TIME = 0 # Time to wait before playing once the move is found, in secon
 CUTOFF = 3 # Depth at which to cut off search (recommended: 3)
 
 class AIPlayer(Player):
-    def __init__(self, id: int, color: str):
+    def __init__(self, id: int, color: str, opponent: Player = None):
         """ Initialize the AIPlayer class
         Args:
             id (int): player id
             color (str): player color
         """
-        super().__init__(id, color)
+        super().__init__(id, color, opponent)
 
     def get_move(self, state: Board):
         """ Get the move from the player

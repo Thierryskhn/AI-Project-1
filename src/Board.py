@@ -3,8 +3,8 @@ from Color import Color
 
 class Board:
 
-    def __init__(self, num_players, list_players, *args, **kwargs):
-        self.num_players = num_players
+    def __init__(self, list_players, *args, **kwargs):
+        self.num_players = 2
         self.pieces = []
         self.list_players = list_players.copy()
 
@@ -19,8 +19,8 @@ class Board:
         else :
             self.zones = self.create_zones(self.num_players)
             self.coordinates = [self.zones[0],self.zones[1],self.zones[2],self.zones[3],self.zones[4],self.zones[5],self.zones[6]]
-            self.start_zones = {list_players[0]:self.zones[1],list_players[1]:self.zones[4]} if num_players==2 else {list_players[0]:self.zones[1],list_players[1]:self.zones[3],list_players[2]:self.zones[5]} #remplacer les nombres par les players?
-            self.end_zones = {list_players[0]:self.zones[4], list_players[1]:self.zones[1]} if num_players == 2 else {list_players[0]:self.zones[4], list_players[1]:self.zones[6],list_players[2]:self.zones[2]}
+            self.start_zones = {list_players[0]:self.zones[1],list_players[1]:self.zones[4]}
+            self.end_zones = {list_players[0]:self.zones[4], list_players[1]:self.zones[1]}
 
     #create each zones with the correct coordinates
     def create_zones(self,num_players):
@@ -135,7 +135,6 @@ class Board:
         """
         return self.get_winner(list_players) != None
         
-
     def get_winner(self, list_players):
         """
         Function that returns the winner of the game, or None if the game is not finished
@@ -211,7 +210,7 @@ class Board:
         """
         Function that returns a copy of the board
         """
-        new_board = Board(self.num_players, self.list_players, copy=True, zones=self.zones, coordinates=self.coordinates, start_zones=self.start_zones, end_zones=self.end_zones)
+        new_board = Board(self.list_players, copy=True, zones=self.zones, coordinates=self.coordinates, start_zones=self.start_zones, end_zones=self.end_zones)
         new_board.pieces = [p.copy() for p in self.pieces]
 
         return new_board

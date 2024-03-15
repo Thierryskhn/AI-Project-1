@@ -1,13 +1,13 @@
 from Player import Player, Board
 
 class RealPlayer(Player):
-    def __init__(self, id: int, color: str):
+    def __init__(self, id: int, color: str, opponent: Player = None):
         """ Initialize the RealPlayer class
         Args:
             id (int): player id
             color (str): player color
         """
-        super().__init__(id, color)
+        super().__init__(id, color, opponent)
 
     def get_coordinates_input(self, board: Board, message: str):
         """ Get the coordinates input from the player
