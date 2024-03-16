@@ -9,7 +9,7 @@ class RealPlayer(Player):
         """
         super().__init__(id, color, opponent)
 
-    def get_coordinates_input(self, board: Board, message: str):
+    def get_coordinates_input(self, board: Board, dests: list, message: str):
         """ Get the coordinates input from the player
         Args:
             board (Board): The current state of the game
@@ -17,8 +17,9 @@ class RealPlayer(Player):
         """
         coordinates = None
         while coordinates == None:
+            print(f"The possible moves for this piece are {dests}")
             move = input(message).strip().split(' ')
-            if len(move) != 3 or not all(coord.isnumeric() for coord in move):
+            if len(move) != 3 or not all(coord.lstrip('-').isnumeric() for coord in move):
                 print("Invalid input, try again")
                 continue
 
@@ -59,14 +60,16 @@ class RealPlayer(Player):
 
         while not valid:
             piece = self.get_id_input(board, f"Player {self.id}: Enter the piece you want to move : ")
-            dest = self.get_coordinates_input(board, f"Player {self.id}: Enter the place you want to move the piece to ('q r s', see src/Board.png): ")
-
+            
             piece = [p for p in board.pieces if p.id == piece and p.color == self.color][0]
+            legal_moves = board.legal_moves(piece)
+            
+            dest = self.get_coordinates_input(board, legal_moves, f"Player {self.id}: Enter the place you want to move the piece to ('q r s', see src/Board.png): ")
 
-            valid = dest in board.legal_moves(piece) and board.coords_in_boards(dest)
+            valid = dest in legal_moves and board.coords_in_boards(dest)
 
             if not valid:
-                print("Invalid move, try again")
+                print(f"Invalid move, try again ({piece.id},{dest})")
 
         print(f"Player {self.id} has played!")
 

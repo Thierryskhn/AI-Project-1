@@ -68,57 +68,61 @@ class Board:
         return abs(piece_coords[0] - coords_to_check[0]) + abs(piece_coords[1] - coords_to_check[1]) + abs(piece_coords[2] - coords_to_check[2]) == 2
 
     def legal_moves(self, piece):
-        """
-        Computes a list of legal moves for a given piece
-        
+        """ Computes a list of legal moves for a given piece
         Args:
             Piece (Piece): the piece for which we want to compute the legal moves
         """
-        # List containing the legal moves for a specific piece
-        legal_moves = []
+        # Set containing the legal moves for a specific piece
+        legal_moves = set()
 
         # First get the piece's coordinates
         piece_x, piece_y, piece_z = piece.coords
 
         # Then we have to search if there is any adjacent piece blocking the current piece
-        neighbour_pieces = self.get_neighbours(piece.coords[0], piece.coords[1], piece.coords[2])
+        neighbour_pieces = self.get_neighbours(piece_x, piece_y, piece_z)
 
         # Adding the neighbouring spaces that are not filled up by the adjacent pieces
         coords_to_check = [(piece_x+1, piece_y-1, piece_z), (piece_x+1, piece_y, piece_z-1), (piece_x, piece_y+1, piece_z-1),
                         (piece_x-1, piece_y+1, piece_z), (piece_x-1, piece_y, piece_z+1), (piece_x, piece_y-1, piece_z+1)]
         for coords in coords_to_check:
-            if self.coords_in_boards(coords) and coords not in [(p.coords) for p in neighbour_pieces]:
-                legal_moves.append(coords)
+            if self.coords_in_boards(coords) and coords not in {(p.coords) for p in neighbour_pieces}:
+                legal_moves.add(coords)
 
         # Now we have to append the spaces that can be added with jumps   
-        places_to_jump_from = [(piece.coords)]
-
+        places_to_jump_from = {piece.coords}
         # Iterate while there are places that have not been expanded
-        while len(places_to_jump_from) > 0:
+        while places_to_jump_from:
             # Get the first element of the list
-            current_place = places_to_jump_from.pop(0)
+            current_place = places_to_jump_from.pop()
 
             neighbour_pieces = self.get_neighbours(current_place[0], current_place[1], current_place[2])
             for neighbour_piece in neighbour_pieces:
                 # If the space after the piece is empty, then we can jump over it
                 # Substract to get the perfect aligned space 
                 x = neighbour_piece.coords[0] - current_place[0]
-                y = neighbour_piece.coords[1] - current_place[1] 
+                y = neighbour_piece.coords[1] - current_place[1]
                 z = neighbour_piece.coords[2] - current_place[2]
-                
+
                 piece_coords_to_check = (neighbour_piece.coords[0] + x, neighbour_piece.coords[1] + y, neighbour_piece.coords[2] + z)
 
                 in_board = self.coords_in_boards(piece_coords_to_check)
-                dest_free = piece_coords_to_check not in [(p.coords) for p in self.pieces]
+                dest_free = piece_coords_to_check not in {(p.coords) for p in self.pieces}
                 not_expanded = piece_coords_to_check not in legal_moves
 
-                if in_board == True and dest_free == True and not_expanded == True:
-                    legal_moves.append(piece_coords_to_check)
-                    places_to_jump_from.append(piece_coords_to_check)
-                    
-        return legal_moves
+                if in_board and dest_free and not_expanded:
+                    legal_moves.add(piece_coords_to_check)
+                    places_to_jump_from.add(piece_coords_to_check)
+
+        return list(legal_moves)  # Convert set back to list
+
 
     def get_neighbours(self, piece_x, piece_y, piece_z):
+        """ Function that returns the neighbours of a piece
+        Args:
+            piece_x (int): the x coordinate of the piece
+            piece_y (int): the y coordinate of the piece
+            piece_z (int): the z coordinate of the piece
+        """
         neighbour_pieces = []
         for p in self.pieces:
             #compute the euclidean distance of the piece to the current piece 

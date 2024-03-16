@@ -1,10 +1,11 @@
 from Player import Player, Board
 from AlphaBeta import AlphaBeta
-from BoardEval import goal_distance_eval
+from BoardEval import eval
 from time import sleep
 
 AI_SLEEP_TIME = 0 # Time to wait before playing once the move is found, in seconds (recommended: 2)
-CUTOFF = 3 # Depth at which to cut off search (recommended: 3)
+CUTOFF = 2 # Depth at which to cut off search (recommended: 3)
+RECENTLY_PLAYED_SIZE = 3 # Number of moves to remember
 
 class AIPlayer(Player):
     def __init__(self, id: int, color: str, opponent: Player = None):
@@ -13,7 +14,8 @@ class AIPlayer(Player):
             id (int): player id
             color (str): player color
         """
-        super().__init__(id, color, opponent)
+        super().__init__(id, color, opponent=opponent, saves_moves=True)
+        self.recently_played = []
 
     def get_move(self, state: Board):
         """ Get the move from the player
@@ -22,8 +24,13 @@ class AIPlayer(Player):
         """
         print(f"Player {self.id} is thinking...")
 
-        ab = AlphaBeta(CUTOFF, goal_distance_eval)
+        ab = AlphaBeta(CUTOFF, eval)
         move = ab.search(self, state, log=False)
+
+        while len(self.recently_played) > RECENTLY_PLAYED_SIZE:
+            self.recently_played.pop(0)
+        to_append = self.build_recently_played_elem(move[0])
+        self.recently_played.append(to_append)
 
         sleep(AI_SLEEP_TIME)
 
@@ -35,3 +42,11 @@ class AIPlayer(Player):
             return None
 
         return move[1] # move[1] is the move, move[0] is the board that results from the move
+    
+    def build_recently_played_elem(self, board):
+        """ Build the set to add to the recently_played list 
+            The set contains the coordinates of the player's pieces, not saving the opponent's pieces
+            or what piece is in each position
+        """
+        return set(p.coords for p in board.pieces if p.color == self.color)
+        

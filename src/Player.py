@@ -2,7 +2,7 @@ from abc import abstractmethod
 from Board import Board
 
 class Player:
-    def __init__(self, id: int, color: str, opponent=None):
+    def __init__(self, id: int, color: str, opponent=None, saves_moves=False):
         """ Initialize the Player class
         Args:
             id (int): player id
@@ -10,6 +10,8 @@ class Player:
         """
         self.id = id
         self.color = color
+        self.opponent = opponent
+        self.saves_moves = saves_moves
 
     def get_id(self):
         """ Get the player id """

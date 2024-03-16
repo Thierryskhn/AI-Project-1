@@ -59,6 +59,8 @@ def main():
 
     #Once the game is finished we can print the winner 
     if board.game_finished(list_players) == True:
+        board.print_board()
+
         winner = board.get_winner(list_players)
         print(f"\n{winner.color.value}{Color.UNDERLINE.value}{Color.BOLD.value}Player {winner.id} has won the game!{Color.END.value}")
     else:
