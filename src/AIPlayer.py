@@ -1,11 +1,11 @@
 from Player import Player, Board
 from AlphaBeta import AlphaBeta
 from BoardEval import eval
-from time import sleep
+from time import sleep, time
 
-AI_SLEEP_TIME = 0 # Time to wait before playing once the move is found, in seconds (recommended: 2)
-CUTOFF = 2 # Depth at which to cut off search (recommended: 3)
-RECENTLY_PLAYED_SIZE = 3 # Number of moves to remember
+AI_MIN_TURN_DURATION = 2 # Minimal duruation of a turn, in seconds (recommended: 2)
+CUTOFF = 3 # Depth at which to cut off search (recommended: 3)
+RECENTLY_PLAYED_SIZE = 3 # Number of moves to remember (recommended: 3)
 
 class AIPlayer(Player):
     def __init__(self, id: int, color: str, opponent: Player = None):
@@ -24,6 +24,8 @@ class AIPlayer(Player):
         """
         print(f"Player {self.id} is thinking...")
 
+        start = time()
+
         ab = AlphaBeta(CUTOFF, eval)
         move = ab.search(self, state, log=False)
 
@@ -32,7 +34,9 @@ class AIPlayer(Player):
         to_append = self.build_recently_played_elem(move[0])
         self.recently_played.append(to_append)
 
-        sleep(AI_SLEEP_TIME)
+        end = time()
+        if end - start < AI_MIN_TURN_DURATION:
+            sleep(AI_MIN_TURN_DURATION - (end - start))
 
         print(f"Player {self.id} has played!")
 
