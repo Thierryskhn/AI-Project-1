@@ -52,7 +52,7 @@
  [],
  False,
  False,
- 1710694091,
+ 1710700523,
  [('run',
    '/Users/nathangromb/opt/miniconda3/lib/python3.9/site-packages/PyInstaller/bootloader/Darwin-64bit/run',
    'EXECUTABLE')],

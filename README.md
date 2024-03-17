@@ -6,3 +6,5 @@ PATH_TO_PYTHON "src/Game.py"
 where PATH_TO_PYTHON is the path to your Python executable.
 
 If the AI takes too long to play for your liking, you can either modify the constants AI_MIN_TURN_DURATION or CUTOFF in AIPlayer, compile and run. Reducing CUTOFF might have an impact on the AI's quality, but will significantly reduce the time to play.
+
+The players' colors are random. If they are too similar (can happen depending on the terminal, machine & settings), try to close and rerun the game.

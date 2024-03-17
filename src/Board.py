@@ -147,15 +147,19 @@ class Board:
         """
         for player in list_players:
             # Initially we assume that the goal is reached
-            goal_reached = True
-            # Iterating through the pieces of each player, we check if they are in the goal state
-            for piece in [p for p in self.pieces if p.color == player.color]:
-                # If one piece does not satisfy the goal, the game is not finished
-                if piece.coords not in self.end_zones[player]:
-                    goal_reached = False
-                    break
+            end_zone_full = True
+
+            # Iterating through the end zone coords of the player to check if all the coords
+            # are occupied by either the player's pieces or the opponent's pieces
+            piece_count = 0
+            for coord in self.end_zones[player]:
+                if coord not in [p.coords for p in self.pieces if p.color == player.color or p.color == player.opponent.color]:
+                    end_zone_full = False
+                    break # if a coord is not occupied by a piece, the goal is not reached for this player
+                elif coord in [p.coords for p in self.pieces if p.color == player.color]:
+                    piece_count += 1
             # Otherwise a player satisified the goal states ! 
-            if goal_reached:
+            if end_zone_full == True and piece_count > 0:
                 return player
         # If no player satisfied the goal states, the game is not finished
         return None
