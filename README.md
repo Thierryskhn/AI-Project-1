@@ -1,4 +1,4 @@
-This game is made in Python (tested with Python 3.9.17) and needs the libraries 'time', 'itertools', 'enum', 'random' and 'abc' to run outside of the project files.
+This game is made in Python (tested with Python 3.9.17) and needs the libraries 'time', 'itertools', 'enum', 'random' and 'abc' to run in addition to the project files.
 
 To start the game, the easier way is to go to src/dist/Game and run the Game executable.
 If this does not work, run this command in a terminal opened in the main folder of the project (i.e. at the folder which contains src) :
