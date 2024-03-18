@@ -4,7 +4,7 @@ from BoardEval import eval
 from time import sleep, time
 
 AI_MIN_TURN_DURATION = 2 # Minimal duruation of a turn, in seconds (recommended: 2)
-CUTOFF = 3 # Depth at which to cut off search (recommended: 3)
+CUTOFF = 2 # Depth at which to cut off search (recommended: 2)
 RECENTLY_PLAYED_SIZE = 3 # Number of moves to remember (recommended: 3)
 
 class AIPlayer(Player):
