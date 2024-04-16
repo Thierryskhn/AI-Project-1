@@ -31,6 +31,12 @@ class BeliefBase:
         """ Expands the belief set by adding the belief to the belief set. """
         self.beliefs.add(belief)
         return self
+    
+    def revise(self, belief: Belief):
+        """ Revises the belief set by contracting the negative belief set and then expanding it with the new belief. """
+        self.contract(Not(belief))
+        self.expand(belief)
+        return self
 
 def main():
     print()
