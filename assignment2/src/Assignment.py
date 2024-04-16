@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 class Assignment:
     """ Represents a set of assignments to variables. """
 
@@ -12,6 +14,10 @@ class Assignment:
 
     def __str__(self) -> str:
         return str(self.assignments)
+    
+    def get_all_assignments(beliefs: list) -> list[Assignment]:
+        """ Returns all possible assignments. """
+        return [Assignment({str(key): value for key, value in zip(beliefs, assignment)}) for assignment in [[True, False] * len(beliefs)]]
     
 def main():
     print()

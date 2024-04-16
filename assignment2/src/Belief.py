@@ -1,7 +1,12 @@
+from __future__ import annotations
 from Assignment import Assignment
 
 class Belief:
     """ Represents a belief in propositional logic. Variables are represented by their names, as strings. """
+
+    def is_tautology(self, belief: Belief) -> bool:
+        """ Returns whether the belief is a tautology. """
+        return all([belief.evaluate(assignment) for assignment in Assignment.get_all_assignments()])
 
     def __init__(self, name: str) -> None:
         self.name = name
@@ -94,6 +99,9 @@ def main():
     print(Iff(a, b))
     print(Not(a))
     print(Not(And(a, If(b, c))))
+
+    for assignment in Assignment.get_all_assignments([a, b, c]):
+        print(assignment)
 
     print()
 
