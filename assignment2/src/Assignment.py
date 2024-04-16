@@ -1,4 +1,5 @@
 from __future__ import annotations
+from itertools import product
 
 class Assignment:
     """ Represents a set of assignments to variables. """
@@ -13,12 +14,13 @@ class Assignment:
         self.assignments[key] = value
 
     def __str__(self) -> str:
-        return str(self.assignments)
+        return "{" + str(', '.join([f"{key}: {value}" for key, value in self.assignments.items()])) + "}"
     
-    def get_all_assignments(beliefs: list) -> list[Assignment]:
+    def get_all_assignments(*beliefs) -> list[Assignment]:
         """ Returns all possible assignments. """
-        return [Assignment({str(key): value for key, value in zip(beliefs, assignment)}) for assignment in [[True, False] * len(beliefs)]]
-    
+        values = [True, False]
+        return [Assignment(dict(zip(beliefs, assignment))) for assignment in product(values, repeat=len(beliefs))]
+
 def main():
     print()
 
