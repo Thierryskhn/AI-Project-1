@@ -20,6 +20,17 @@ class BeliefBase:
 
     def __str__(self) -> str:
         return "{" + ", ".join([str(belief) for belief in self.beliefs]) + "}"
+    
+    def contract(self, belief : Belief): 
+        """ Contracts the belief set by removing the belief from the belief set. """
+        #TODO base it on priority order
+        self.beliefs.remove(belief)
+        return self
+    
+    def expand(self, belief : Belief): 
+        """ Expands the belief set by adding the belief to the belief set. """
+        self.beliefs.add(belief)
+        return self
 
 def main():
     print()
