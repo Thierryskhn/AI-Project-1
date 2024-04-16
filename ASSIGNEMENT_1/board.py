@@ -1,5 +1,5 @@
-import piece
-from color import Color;
+import ASSIGNEMENT_1.piece as piece
+from ASSIGNEMENT_1.color import Color;
 class Board: 
     def __init__(self, num_players, list_players):
         self.num_players = num_players

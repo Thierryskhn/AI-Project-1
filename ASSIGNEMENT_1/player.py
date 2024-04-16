@@ -1,5 +1,5 @@
 from abc import abstractmethod 
-from board import Board
+from ASSIGNEMENT_1.board import Board
 
 class Player:
     def __init__(self, id: int, color: str):
