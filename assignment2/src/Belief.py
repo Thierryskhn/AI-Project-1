@@ -8,7 +8,7 @@ from sympy.logic.boolalg import to_cnf, Equivalent, Implies, And as AndSympy, Or
 class Belief:
     """ Represents a belief in propositional logic. Variables are represented by their names, as strings. """
 
-    def from_sympy(boolean: Boolean) -> Belief:
+    def from_sympy(boolean: Boolean ) -> Belief:
         """ Returns the belief from a sympy boolean. """
         if isinstance(boolean, Equivalent):
             return Iff(Belief.from_sympy(boolean.args[0]), Belief.from_sympy(boolean.args[1]))
@@ -50,14 +50,23 @@ class Belief:
         """ Returns whether the belief is a tautology, i.e. it is true for all possible assignments. """
         return all(belief.evaluate(assignment) for assignment in Assignment.get_all_assignments(*belief.get_variables()))
 
-    def __init__(self, name: str) -> None:
+    def __init__(self, name: str, rank: int = None):
         self.name = name
+        self.rank = rank
 
     def __str__(self) -> str:
-        return self.name
+        return self.name 
     
+    def __repr__(self) -> str:
+        return str(self)
+        
     def __eq__(self, other: object) -> bool:
         return isinstance(other, Belief) and self.name == other.name
+    
+    def __lt__(self,other:object) -> bool:
+        if not isinstance(other,Belief) : return False
+        if self.rank == None or other.rank == None: return False
+        else: return self.rank < other.rank
     
     def __hash__(self) -> int:
         return hash(str(self))
@@ -69,18 +78,31 @@ class Belief:
     def get_variables(self) -> set[str]:
         """ Returns the variables in the belief. """
         return {self.name}
+    
+    def set_rank(self, rank: int)-> None : 
+        """ Sets the rank of the belief, raises a Type Error if not correct"""
+        if not self.check_rank(rank): raise TypeError("Incorrect rank given")
+        self.rank = rank
+
+    def check_rank(self,rank:int) -> Boolean:
+        """Checks if the given rank is between 0 and 1 an error is raised"""
+        return 0 <= rank <= 1
+    
+
+        
 
 class EmptyClause(Belief):
     """ Represents an empty clause, i.e. a contradiction. """
 
     def __init__(self) -> None:
+        self.rank = 0 
         pass
 
     def __str__(self) -> str:
         return "⊥"
     
     def __eq__(self, other: object) -> bool:
-        return isinstance(other, EmptyClause)
+        return isinstance(other, EmptyClause) 
     
     def __hash__(self) -> int:
         return hash(str(self))
@@ -96,14 +118,15 @@ class EmptyClause(Belief):
 class Not(Belief):
     """ Represents the negation of a belief's proposition.  """
 
-    def __init__(self, belief: Belief) -> None:
+    def __init__(self, belief: Belief, rank: int = None) -> None:
         self.belief = belief
+        self.rank = rank 
 
     def __str__(self) -> str:
         return "¬" + str(self.belief)
     
     def __eq__(self, other: object) -> bool:
-        return isinstance(other, Not) and self.belief == other.belief
+        return isinstance(other, Not) and (self.rank == other.rank) and self.belief == other.belief 
     
     def __hash__(self) -> int:
         return hash(str(self))
@@ -118,15 +141,16 @@ class Not(Belief):
 
 class And(Belief):
     """ Represents the conjunction of two beliefs' proposition. """
-    def __init__(self, left: Belief, right: Belief) -> None:
+    def __init__(self, left: Belief, right: Belief, rank: int = None) -> None:
         self.left = left
         self.right = right
+        self.rank = rank
 
     def __str__(self) -> str:
         return "(" + str(self.left) + " ∧ " + str(self.right) + ")"
     
     def __eq__(self, other: object) -> bool:
-        return isinstance(other, And) and ((self.left == other.left and self.right == other.right) or (self.left == other.right and self.right == other.left))
+        return isinstance(other, And) and (self.rank == other.rank) and ((self.left == other.left and self.right == other.right) or (self.left == other.right and self.right == other.left))
     
     def __hash__(self) -> int:
         return hash(str(self)) + hash(str(And(self.right, self.left)))
@@ -142,15 +166,16 @@ class And(Belief):
 class Or(Belief):
     """ Represents the disjunction of two beliefs' proposition. """
 
-    def __init__(self, left: Belief, right: Belief) -> None:
+    def __init__(self, left: Belief, right: Belief, rank: int = None) -> None:
         self.left = left
         self.right = right
+        self.rank = rank
 
     def __str__(self) -> str:
         return "(" + str(self.left) + " v " + str(self.right) + ")"
     
     def __eq__(self, other: object) -> bool:
-        return isinstance(other, Or) and ((self.left == other.left and self.right == other.right) or (self.left == other.right and self.right == other.left))
+        return isinstance(other, Or) and (self.rank == other.rank) and ((self.left == other.left and self.right == other.right) or (self.left == other.right and self.right == other.left))
     
     def __hash__(self) -> int:
         return hash(str(self)) + hash(str(Or(self.right, self.left)))
@@ -166,9 +191,10 @@ class Or(Belief):
 class If(Belief):
     """ Represents the implication of two beliefs' proposition. """
 
-    def __init__(self, left: Belief, right: Belief) -> None:
+    def __init__(self, left: Belief, right: Belief, rank: int = None) -> None:
         self.left = left
         self.right = right
+        self.rank = rank
 
     def __str__(self) -> str:
         return "(" + str(self.left) + " → " + str(self.right) + ")"
@@ -190,15 +216,16 @@ class If(Belief):
 class Iff(Belief):
     """ Represents the biconditional of two beliefs' proposition. """
     
-    def __init__(self, left: Belief, right: Belief) -> None:
+    def __init__(self, left: Belief, right: Belief, rank: int = None) -> None:
         self.left = left
         self.right = right
+        self.rank = rank
 
     def __str__(self) -> str:
         return "(" + str(self.left) + " ↔ " + str(self.right) + ")"
     
     def __eq__(self, other: object) -> bool:
-        return isinstance(other, Iff) and ((self.left == other.left and self.right == other.right) or (self.left == other.right and self.right == other.left))
+        return isinstance(other, Iff) and (self.rank == other.rank) and ((self.left == other.left and self.right == other.right) or (self.left == other.right and self.right == other.left))
 
     def __hash__(self) -> int:
         return hash(str(self)) + hash(str(Iff(self.right, self.left)))
@@ -212,12 +239,11 @@ class Iff(Belief):
         return self.left.get_variables() | self.right.get_variables()
 
 def main():
-    print()
-
-    a = Belief("a")
+    
+    a = Belief("a", 0.3)
     b = Belief("b")
     c = Belief("c")
-    d = Belief("d")
+    d = Belief("d", 0.7)
     print(And(a, b))
     print(Or(a, b))
     print(If(a, b))
