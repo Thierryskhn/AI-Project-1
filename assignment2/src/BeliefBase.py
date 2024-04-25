@@ -1,5 +1,6 @@
 from __future__ import annotations # For type hints in class methods
 from Belief import Belief, Not, And, Or, If, Iff, EmptyClause
+from Assignment import Assignment
 from functools import reduce
 
 class BeliefBase:
@@ -27,82 +28,137 @@ class BeliefBase:
         new_beliefs = self.beliefs.copy()
         new_beliefs.add(belief)
         return BeliefBase(*new_beliefs)
-    
+
     def revise(self, belief: Belief) -> BeliefBase:
         """ Revises the belief base by contracting the negative belief base and then expanding it with the new belief. """
         new_beliefbase = BeliefBase(*self.beliefs)
         new_beliefbase.contract(Not(belief))
         new_beliefbase.expand(belief)
         return new_beliefbase
-    
-    ## TODO: keep?
+
     def to_cnf_set(self) -> list[list[Belief]]:
         """ Converts the belief to a set of clauses (set that can be interpreted as a CNFs). 
             This allows for the resolution algorithm to be applied,
             enabling it to iterate over the clauses and literals to resolve them.
         """
-        beliefCNFs = [belief.to_cnf() for belief in self.beliefs]
-        ands = reduce(lambda b1, b2: And(b1, b2), beliefCNFs)
 
-        if isinstance(ands, And):
-            return self._to_list_and(ands)
+        beliefs = list(self.beliefs)
 
-        return [{ands}]
+        if len(beliefs) == 0:
+            return [[EmptyClause()]]
+        
+        if len(beliefs) == 1:
+            return [[beliefs[0].to_cnf()]]
+        
+        ands = And(beliefs[0].to_cnf(), beliefs[1].to_cnf())
 
-    ## TODO: keep?
-    def _to_list_and(self, belief: Belief):
-        """ Takes a CNF belief and converts it to a list of the clauses,
-            where each clause is a set of the literals (Beliefs or their negations).
+        for belief in beliefs[2:]:
+            ands = And(ands, belief.to_cnf())
+
+        return BeliefBase._flatten_cnf_and(ands, [])
+
+    def _flatten_cnf_and(belief: Belief, current: list[list[Belief]]) -> list[list[Belief]]:
+        """ Flattens an And belief to a list of beliefs. """
+        new_current = current.copy()
+
+        if not isinstance(belief, And):
+            return new_current + [belief]
+
+        if isinstance(belief.left, And):
+            new_current += BeliefBase._flatten_cnf_and(belief.left, new_current)
+        elif isinstance(belief.left, Or):
+            new_current.append(BeliefBase._flatten_cnf_or(belief.left, new_current))
+        else:
+            new_current.append([belief.left])
+        
+        if isinstance(belief.right, And):
+            new_current += BeliefBase._flatten_cnf_and(belief.right, new_current)
+        elif isinstance(belief.right, Or):
+            new_current.append(BeliefBase._flatten_cnf_or(belief.right, new_current))
+        else:
+            new_current.append([belief.right])
+
+        return new_current
+        
+        
+    def _flatten_cnf_or(belief: Or, current: list[Belief]) -> list[Belief]:
+        """ Flattens an Or belief to a list of beliefs. 
+            As it is assumed that the belief is in CNF, the Or should only contain literals.
         """
-        if isinstance(belief, And):
-            return self._to_list_and(belief.left) + self._to_list_and(belief.right)
-        elif isinstance(belief, Or):
-            return [self._to_set_or(belief)]
+        new_current = current.copy()
+
+        if isinstance(belief.left, Or):
+            new_current += BeliefBase._flatten_cnf_or(belief.left, new_current)
         else:
-            return [{belief}]
-    
-    ## TODO: keep?
-    def _to_set_or(self, belief: Belief):
-        """ Takes a DNF belief and converts it to a set of the clauses. """
-        if isinstance(belief, Or):
-            return self._to_set_or(belief.left) | self._to_set_or(belief.right)
+            new_current.append(belief.left)
+
+        if isinstance(belief.right, Or):
+            new_current += BeliefBase._flatten_cnf_or(belief.right, new_current)
         else:
-            return {belief}
+            new_current.append(belief.right)
+
+        return new_current
 
     def entails(self, belief: Belief) -> bool:
-        """ Checks if the belief follows from the belief base using resolution. """
-        return self.resolution(self.expand(Not(belief)))
+        """ Checks if the belief follows from the belief base using the DPLL algorithm.
+            Week 10: Testing entailment φ |= ψ, is done by testing unsatisfiability of φ ∧ ¬ψ
+        """
+        return self._dpll_satisfiable(self.expand(Not(belief))) == False
 
-    def resolution(self, beliefbase: BeliefBase) -> bool:
-        """ Implements the resolution algorithm. """
+    def _dpll_satisfiable(base: BeliefBase) -> bool:
+        clauses = base.to_cnf_set()
+        symbols = [belief.get_variables() for belief in base.get_beliefs()]
 
-        # Initial clauses contain the negated belief and the existing beliefs
-        clauses = self.to_cnf_set()
+        return BeliefBase._dpll(clauses, symbols, Assignment({}));
+
+    def _dpll(clauses: list[list[Belief]], symbols: list[set[str]], model: Assignment) -> bool:
+        if all(clause.eval(model) for clause in clauses):
+            return True
+
+        if not any(clause.eval(model) for clause in clauses):
+            return False
+    
+        p, value = BeliefBase._find_pure_symbols(clauses, symbols, model)
+
+        if p:
+            return BeliefBase._dpll(clauses, symbols, model.extend(p, value))
+
+        p, value = BeliefBase._find_unit_clause(clauses, symbols, model)
+
+        if p:
+            return BeliefBase._dpll(clauses, symbols, model.extend(p, value))
+
+        p = symbols[0]
+        rest = symbols[1:]
+
+        return BeliefBase._dpll(clauses, rest, model.extend(p, True)) or BeliefBase._dpll(clauses, rest, model.extend(p, False))
+
+    def _find_pure_symbols(clauses: list[list[Belief]], symbols: list[set[str]], model: Assignment):
+        p = None
+
+        for symbol in symbols:
+            positive = False
+            negative = False
+
+            for clause in clauses:
+                if symbol in clause:
+                    positive = True
+                if Not(symbol) in clause:
+                    negative = True
+
+            if positive != negative:
+                p = symbol
+                value = positive
+                break
         
-        while True:
-            new_clauses = []
-            for i in range(len(clauses)):
-                for j in range(i + 1, len(clauses)):
-                    resolvents = self.resolve_pair(clauses[i], clauses[j])
-                    if EmptyClause() in resolvents:
-                        return True  # Empty clause found, contradiction, so belief follows
-                    new_clauses.extend(resolvents)
-            if set(new_clauses).issubset(set(clauses)):
-                return False  # No new clauses generated, no contradiction found
-            clauses.extend(new_clauses)
+        return p, value
 
-    def resolve_pair(clause1: list[Belief], clause2: list[Belief]) -> list[Belief]:
-        """ Resolves two clauses to produce new resolvents. """
-        resolvents = []
-        for belief1 in clause1:
-            for belief2 in clause2:
-                if belief1 == Not(belief2) or Not(belief1) == belief2:
-                    resolvents.append(list(set(clause1 + clause2) - {belief1, belief2}))
-        return resolvents
+    def _find_unit_clause(clauses: list[list[Belief]], symbols: list[set[str]], model: Assignment):
+        return p, value
 
 def main():
     def print_cnf_set(cnf_set):
-        return "[" + ", ".join(['{' + ", ".join([str(c) for c in clause]) + '}' for clause in cnf_set]) + "]"
+        return "[" + ", ".join([str(belief) for beliefs in cnf_set for belief in beliefs]) + "]"
 
     print()
 
@@ -124,9 +180,9 @@ def main():
     print(belief_base)
     print(print_cnf_set(belief_base.to_cnf_set()))
 
-    belief_base2 = BeliefBase(*[c.to_cnf() for c in [Not(a), Not(b), Not(a_or_b), And(a, b)]])
-    print(belief_base2)
-    print(print_cnf_set(belief_base2.to_cnf_set()))
+    belief_base2 = BeliefBase(Not(a), Not(b), If(Not(a), Not(b)))
+    print('base ' + str(belief_base2))
+    print('cnf ' + print_cnf_set(belief_base2.to_cnf_set()))
 
     print()
 

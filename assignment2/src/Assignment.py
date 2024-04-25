@@ -16,6 +16,12 @@ class Assignment:
     def __str__(self) -> str:
         return "{" + str(', '.join([f"{key}: {value}" for key, value in self.assignments.items()])) + "}"
     
+    def extend(self, key: str, value: bool) -> Assignment:
+        """ Returns a new assignment with the given key and value. """
+        assignments = self.assignments.copy()
+        assignments[key] = value
+        return Assignment(assignments)
+
     def get_all_assignments(*beliefs) -> list[Assignment]:
         """ Returns all possible assignments. """
         values = [True, False]
