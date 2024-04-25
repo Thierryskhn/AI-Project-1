@@ -1,4 +1,4 @@
-from BeliefBase import BeliefBase, _dpll, _find_pure_symbols, _find_unit_clause, entails
+from BeliefBase import BeliefBase
 from Belief import Belief, Not, And, Or, If, Iff
 
 class BeliefBaseContractionTests:
@@ -23,9 +23,9 @@ class BeliefBaseContractionTests:
             #should be false
             assert(not(B.contract(belief).entails(belief)))
     
-    def inlusion(belief: Belief, B: BeliefBase):
+    def inclusion(belief: Belief, B: BeliefBase):
        """Tests if the outcome is a subset of the original set""" 
-       assert(B.contract(belief).beliefs.isssubset(B.beliefs))
+       assert(B.contract(belief).beliefs.issubset(B.beliefs))
     
     def vacuity(belief: Belief, B: BeliefBase):
         """Tests if the incoming sentence is not in the original set then there is no effect""" 
@@ -36,13 +36,13 @@ class BeliefBaseContractionTests:
         """Tests if the outcomes of contracting with equivalent sentences are the same"""
 
         nothing = BeliefBase()
-        if(nothing.entalis(Iff(belief1, belief2))):
+        if(nothing.entails(Iff(belief1, belief2))):
             assert(B.contract(belief1).beliefs == B.contract(belief2).beliefs)
     
     def recovery(belief: Belief, B: BeliefBase):
         """Contraction leads to the loss of as few previous beliefs as possible""" 
         #TODO just check in which way it works and it's cool
-        assert(B.issubset(B.contract(belief).expand(belief)))
+        assert(B.beliefs.issubset(B.contract(belief).expand(belief)))
 
     def conjunctive_inclusion(belief1: Belief, belief2: Belief, B: BeliefBase):
         """Tests the conjunctive inclusion property""" 
@@ -79,7 +79,7 @@ class BeliefBaseRevisionTests:
     def extensionality(belief1: Belief, belief2: Belief, B: BeliefBase):
         """Tests if the outcomes of contracting with equivalent sentences are the same"""
         nothing = BeliefBase()
-        if(nothing.entalis(Iff(belief1, belief2))):
+        if(nothing.entails(Iff(belief1, belief2))):
             assert(B.revise(belief1) == B.revise(belief2))
 
     def superexpansion(belief1: Belief, belief2: Belief, B: BeliefBase):
@@ -89,4 +89,31 @@ class BeliefBaseRevisionTests:
     def subexpansion(belief1: Belief, belief2: Belief, B: BeliefBase):
         """Tests the subexpansion property""" 
         if Not(belief1) not in Cn(B.revise(belief2)):
-            assert(B.revise(belief2).expand(belief1).isssubset(B.revise(And(belief1, belief2))))
+            assert(B.revise(belief2).expand(belief1).issubset(B.revise(And(belief1, belief2))))
+
+def main():
+    print("Testing BeliefBaseContractionTests")
+    a = Belief("a")
+    b = Belief("b")
+    c = Belief("c")
+    d = Belief("d")
+    B = BeliefBase(a, b, c, d)
+    #BeliefBaseContractionTests.closure(B, a)
+    BeliefBaseContractionTests.success(a, B)
+    BeliefBaseContractionTests.inclusion(a, B)
+    BeliefBaseContractionTests.vacuity(a, B)
+    BeliefBaseContractionTests.extensionality(a, b, B)
+    BeliefBaseContractionTests.recovery(a, B)
+    BeliefBaseContractionTests.conjunctive_inclusion(a, b, B)
+    BeliefBaseContractionTests.conjunctive_overlap(a, b, B)
+
+    #BeliefBaseRevisionTests.closure(B, a)
+    BeliefBaseRevisionTests.success(B, a)
+    BeliefBaseRevisionTests.inclusion(B, a)
+    BeliefBaseRevisionTests.vacuity(B, a)
+    BeliefBaseRevisionTests.extensionality(a, b, B)
+    BeliefBaseRevisionTests.superexpansion(a, b, B)
+    #BeliefBaseRevisionTests.subexpansion(a, b, B)
+
+if __name__ == "__main__":
+    main()
