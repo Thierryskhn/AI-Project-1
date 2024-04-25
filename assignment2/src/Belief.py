@@ -64,6 +64,9 @@ class Belief:
     
     def evaluate(self, assignment: Assignment) -> bool:
         """ Evaluates the belief given an assignment to variables. """
+        if self.name not in assignment.keys():
+            return None
+
         return assignment[self.name]
 
     def get_variables(self) -> set[str]:
@@ -110,6 +113,9 @@ class Not(Belief):
     
     def evaluate(self, assignment: Assignment) -> bool:
         """ Evaluates the belief given an assignment to variables. """
+        if self.belief.evaluate(assignment) == None:
+            return None
+
         return not self.belief.evaluate(assignment)
 
     def get_variables(self) -> set[str]:
@@ -133,6 +139,9 @@ class And(Belief):
     
     def evaluate(self, assignment: Assignment) -> bool:
         """ Evaluates the belief given an assignment to variables. """
+        if self.left.evaluate(assignment) == None or self.right.evaluate(assignment) == None:
+            return None
+
         return self.left.evaluate(assignment) and self.right.evaluate(assignment)
 
     def get_variables(self) -> set[str]:
@@ -181,7 +190,7 @@ class If(Belief):
 
     def evaluate(self, assignment: Assignment) -> bool:
         """ Evaluates the belief given an assignment to variables. """
-        return not self.left.evaluate(assignment) or self.right.evaluate(assignment)
+        return  Not(self.left).evaluate(assignment) or self.right.evaluate(assignment)
 
     def get_variables(self) -> set[str]:
         """ Returns the variables in the belief. """
