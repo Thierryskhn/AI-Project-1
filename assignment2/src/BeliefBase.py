@@ -167,8 +167,8 @@ def main():
 
     belief_base3 = BeliefBase(Or(a, b), Not(b))
     print('base ' + str(belief_base3))
-    print('base entails a: ' + str(belief_base3.entails(a)))
-    print('base entails b: ' + str(belief_base3.entails(b)))
+    print('base entails a: ' + str(belief_base3.entails(a)) + ' (should be True)')
+    print('base entails b: ' + str(belief_base3.entails(b)) + ' (should be False)')
 
 def tests():
     def print_cnf_set(cnf_set):
