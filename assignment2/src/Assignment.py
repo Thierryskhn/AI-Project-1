@@ -25,11 +25,6 @@ class Assignment:
         assignments[key] = value
         return Assignment(assignments)
 
-    def get_all_assignments(*beliefs) -> list[Assignment]:
-        """ Returns all possible assignments. """
-        values = [True, False]
-        return [Assignment(dict(zip(beliefs, assignment))) for assignment in product(values, repeat=len(beliefs))]
-
 def main():
     print()
 

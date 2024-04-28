@@ -54,11 +54,6 @@ class Belief:
     def to_cnf(self) -> Belief:
         return Belief.from_sympy(to_cnf(self.to_sympy()))
 
-
-    def is_tautology(belief: Belief) -> bool:
-        """ Returns whether the belief is a tautology, i.e. it is true for all possible assignments. """
-        return all(belief.evaluate(assignment) for assignment in Assignment.get_all_assignments(*belief.get_variables()))
-
     def __init__(self, name: str) -> None:
         self.name = name
 
@@ -268,14 +263,6 @@ def main():
     print(Iff(a, b))
     print(Not(a))
     print(Not(And(a, If(b, c))))
-
-    print("\nget_all_assignments:")
-    for assignment in Assignment.get_all_assignments(a, b):
-        print(assignment)
-
-    print("\nis_tautology:")
-    print(Belief.is_tautology(And(a, Not(a))))
-    print(Belief.is_tautology(Or(a, Not(a))))
 
     print("\nget_variables:")
     a_and_b = And(a, b)
