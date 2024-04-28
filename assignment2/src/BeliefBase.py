@@ -161,20 +161,15 @@ class BeliefBase:
         return p, value
 
 def main():
-    a = Belief("a")
-    b = Belief("b")
-    print('DPLL:')
+    #cnf_tests()
+    #entailment_tests()
+    ...
 
-    belief_base3 = BeliefBase(Or(a, b), Not(b))
-    print('base ' + str(belief_base3))
-    print('base entails a: ' + str(belief_base3.entails(a)) + ' (should be True)')
-    print('base entails b: ' + str(belief_base3.entails(b)) + ' (should be False)')
-
-def tests():
+def cnf_tests():
     def print_cnf_set(cnf_set):
         return "[" + ", ".join(["[" + ", ".join([str(literal) for literal in clause]) + "]" for clause in cnf_set]) + "]"
 
-    print()
+    print("\nCNF tests:")
 
     a = Belief("a")
     b = Belief("b")
@@ -197,6 +192,37 @@ def tests():
     belief_base2 = BeliefBase(Not(a), Not(b), If(Not(a), Not(b)))
     print('base ' + str(belief_base2))
     print('cnf ' + print_cnf_set(belief_base2.to_cnf_list()))
+
+    print()
+
+def entailment_tests():
+    print("\nEntailment tests:")
+
+    a = Belief("a")
+    b = Belief("b")
+    c = Belief("c")
+    d = Belief("d")
+    belief_base = BeliefBase(a, b, c, d)
+    print("\nBelief base: " + str(belief_base))
+    print(str(a) + ": " + str(belief_base.entails(a)) + " should be True")
+    print(str(Not(a)) + ": " + str(belief_base.entails(Not(a))) + " should be False")
+    print(str(And(a, b)) + ": " + str(belief_base.entails(And(a, b))) + " should be True")
+    print(str(And(a, Not(b))) + ": " + str(belief_base.entails(And(a, Not(b)))) + " should be False")
+    print(str(And(a, And(b, c))) + ": " + str(belief_base.entails(And(a, And(b, c)))) + " should be True")
+    print(str(And(And(a, b), Not(c))) + ": " + str(belief_base.entails(And(And(a, b), Not(c)))) + " should be False")
+    print(str(And(And(a, b), And(c, d))) + ": " + str(belief_base.entails(And(And(a, b), And(c, d)))) + " should be True")
+    print(str(And(And(a, b), And(And(c, d), Not(d)))) + ": " + str(belief_base.entails(And(And(a, b), And(And(c, d), Not(d))))) + " should be False")
+
+    belief_base2 = BeliefBase(Not(a), Not(b), If(Not(a), Not(b)))
+    print("\nBelief base 2: " + str(belief_base2))
+    print(str(Not(a)) + ": " + str(belief_base2.entails(Not(a))) + " should be True")
+    print(str(a) + ": " + str(belief_base2.entails(a)) + " should be False")
+    print(str(Not(b)) + ": " + str(belief_base2.entails(Not(b))) + " should be True")
+    print(str(a) + ": " + str(belief_base2.entails(b)) + " should be False")
+    print(str(If(Not(a), Not(b))) + ": " + str(belief_base2.entails(If(Not(a), Not(b)))) + " should be True")
+    print(str(If(a, Not(b))) + ": " + str(belief_base2.entails(If(a, Not(b)))) + " should be True")
+    print(str(If(Not(a), b)) + ": " + str(belief_base2.entails(If(Not(a), b))) + " should be False")
+    print(str(If(a, b)) + ": " + str(belief_base2.entails(If(a, b))) + " should be True")
 
     print()
 

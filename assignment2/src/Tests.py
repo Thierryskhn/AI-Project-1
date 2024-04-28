@@ -1,4 +1,4 @@
-from BeliefBase import BeliefBase, _dpll, _find_pure_symbols, _find_unit_clause, entails
+from BeliefBase import BeliefBase
 from Belief import Belief, Not, And, Or, If, Iff
 
 class BeliefBaseContractionTests:
@@ -12,7 +12,7 @@ class BeliefBaseContractionTests:
         """ Tests the closure of the belief base. """
 
         #TODO : Make a better closure because we cannot do it right now. 
-        #Maybe we can't do it because it is computationally expensive.
+        # Maybe we can't do it because it is computationally expensive.
         print("Closure test")
         assert(B.contract(belief) == Cn(B))
         
@@ -23,9 +23,9 @@ class BeliefBaseContractionTests:
             #should be false
             assert(not(B.contract(belief).entails(belief)))
     
-    def inlusion(belief: Belief, B: BeliefBase):
+    def inclusion(belief: Belief, B: BeliefBase):
        """Tests if the outcome is a subset of the original set""" 
-       assert(B.contract(belief).beliefs.isssubset(B.beliefs))
+       assert(B.contract(belief).beliefs.issubset(B.beliefs))
     
     def vacuity(belief: Belief, B: BeliefBase):
         """Tests if the incoming sentence is not in the original set then there is no effect""" 
@@ -89,5 +89,29 @@ class BeliefBaseRevisionTests:
     def subexpansion(belief1: Belief, belief2: Belief, B: BeliefBase):
         """Tests the subexpansion property""" 
         if Not(belief1) not in B.revise(belief2).beliefs:
-            assert(B.revise(belief2).expand(belief1).beliefs.isssubset(B.revise(And(belief1, belief2)).beliefs))
+            assert(B.revise(belief2).expand(belief1).beliefs.issubset(B.revise(And(belief1, belief2)).beliefs))
 
+def main() -> None:
+    B = BeliefBase(Belief("A"), Belief("B"))
+
+    #Contraction tests
+    #BeliefBaseContractionTests.closure(B, Belief("A"))
+    BeliefBaseContractionTests.success(Belief("A"), B)
+    BeliefBaseContractionTests.inclusion(Belief("A"), B)
+    BeliefBaseContractionTests.vacuity(Belief("C"), B)
+    BeliefBaseContractionTests.extensionality(Belief("A"), Belief("B"), B)
+    BeliefBaseContractionTests.recovery(Belief("A"), B)
+    BeliefBaseContractionTests.conjunctive_inclusion(Belief("A"), Belief("B"), B)
+    BeliefBaseContractionTests.conjunctive_overlap(Belief("A"), Belief("B"), B)
+
+    #Revision tests
+    #BeliefBaseRevisionTests.closure(B, Belief("A"))
+    BeliefBaseRevisionTests.success(B, Belief("A"))
+    BeliefBaseRevisionTests.inclusion(B, Belief("A"))
+    BeliefBaseRevisionTests.vacuity(B, Belief("C"))
+    BeliefBaseRevisionTests.extensionality(Belief("A"), Belief("B"), B)
+    BeliefBaseRevisionTests.superexpansion(Belief("A"), Belief("B"), B)
+    BeliefBaseRevisionTests.subexpansion(Belief("A"), Belief("B"), B)
+
+if __name__ == "__main__":
+    main()
