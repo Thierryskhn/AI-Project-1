@@ -1,12 +1,10 @@
 from BeliefBase import BeliefBase
-from Belief import Belief, Not, And, Or, If, Iff
+from Belief import Belief, Not, And, Or, If, Iff, to_cnf
 
 class BeliefBaseContractionTests:
 
     def __init__(self, beliefBase : BeliefBase):
         self.beliefBase = beliefBase    
-
-    #TODO : We might have to change the way by adding to every B ".beliefs" 
 
     def closure(B: BeliefBase, belief: Belief):
         """ Tests the closure of the belief base. """
@@ -77,6 +75,10 @@ class BeliefBaseRevisionTests:
         if B.entails(belief):
             assert(B.revise(belief).beliefs == B.beliefs)
 
+    def consistency(B: BeliefBase, belief: Belief):
+        """Tests if the outcome is consistent with the original set"""
+        assert(not B.entails(And(belief, Not(belief))))
+
     def extensionality(belief1: Belief, belief2: Belief, B: BeliefBase):
         """Tests if the outcomes of contracting with equivalent sentences are the same"""
         nothing = BeliefBase()
@@ -110,6 +112,7 @@ def main() -> None:
     BeliefBaseRevisionTests.success(B, Belief("A"))
     BeliefBaseRevisionTests.inclusion(B, Belief("A"))
     BeliefBaseRevisionTests.vacuity(B, Belief("C"))
+    BeliefBaseRevisionTests.consistency(B, Belief("D"))
     BeliefBaseRevisionTests.extensionality(Belief("A"), Belief("B"), B)
     BeliefBaseRevisionTests.superexpansion(Belief("A"), Belief("B"), B)
     BeliefBaseRevisionTests.subexpansion(Belief("A"), Belief("B"), B)
