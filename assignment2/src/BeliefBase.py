@@ -18,6 +18,9 @@ class BeliefBase:
     
     def contract(self, belief : Belief) -> BeliefBase: 
         """ Contracts the belief base by removing the belief from the belief base. """
+        if not belief in self.beliefs:
+            return self
+
         new_beliefs = self.beliefs.copy()
         new_beliefs.remove(belief)
         return BeliefBase(*new_beliefs)
@@ -88,12 +91,12 @@ class BeliefBase:
         new_current = []
 
         if isinstance(belief.left, Or):
-            new_current += BeliefBase._flatten_cnf_or(belief.left, new_current)
+            new_current += BeliefBase._flatten_cnf_or(belief.left)
         else:
             new_current.append(belief.left)
 
         if isinstance(belief.right, Or):
-            new_current += BeliefBase._flatten_cnf_or(belief.right, new_current)
+            new_current += BeliefBase._flatten_cnf_or(belief.right)
         else:
             new_current.append(belief.right)
 
@@ -112,6 +115,7 @@ class BeliefBase:
         return BeliefBase._dpll(clauses, symbols, Assignment({}));
 
     def _dpll(clauses: list[list[Belief]], symbols: set[str], model: Assignment) -> bool:
+
         if all(any(belief.evaluate(model) is True for belief in clause) for clause in clauses):
             return True
 
@@ -129,7 +133,6 @@ class BeliefBase:
             return BeliefBase._dpll(clauses, symbols - {p}, model.extend(p, value))
 
         p, *rest = symbols
-
 
         return BeliefBase._dpll(clauses, rest, model.extend(p, True)) or BeliefBase._dpll(clauses, rest, model.extend(p, False))
 
@@ -161,8 +164,8 @@ class BeliefBase:
         return p, value
 
 def main():
-    #cnf_tests()
-    #entailment_tests()
+    cnf_tests()
+    entailment_tests()
     ...
 
 def cnf_tests():
@@ -223,6 +226,17 @@ def entailment_tests():
     print(str(If(a, Not(b))) + ": " + str(belief_base2.entails(If(a, Not(b)))) + " should be True")
     print(str(If(Not(a), b)) + ": " + str(belief_base2.entails(If(Not(a), b))) + " should be False")
     print(str(If(a, b)) + ": " + str(belief_base2.entails(If(a, b))) + " should be True")
+
+    nothing = BeliefBase()
+    print("\nBelief base 3: " + str(nothing))
+
+    print(str(a) + ": " + str(nothing.entails(a)) + " should be False")
+    print(str(Not(a)) + ": " + str(nothing.entails(Not(a))) + " should be False")
+    print(str(And(a, b)) + ": " + str(nothing.entails(And(a, b))) + " should be False")
+    print(str(And(a, Not(b))) + ": " + str(nothing.entails(And(a, Not(b)))) + " should be False")
+    print(str(And(a, And(b, c))) + ": " + str(nothing.entails(And(a, And(b, c)))) + " should be False")
+    print(str(Iff(a, a)) + ": " + str(nothing.entails(Iff(a, a))) + " should be True")
+    print(str(Iff(a, c)) + ": " + str(nothing.entails(Iff(a, c))) + " should be False")
 
     print()
 

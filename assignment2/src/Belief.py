@@ -5,21 +5,28 @@ from Assignment import Assignment
 from sympy import symbols
 from sympy.logic.boolalg import to_cnf, Equivalent, Implies, And as AndSympy, Or as OrSympy, Not as NotSympy, Boolean
 
+from functools import reduce
+
 class Belief:
     """ Represents a belief in propositional logic. Variables are represented by their names, as strings. """
 
     def from_sympy(boolean: Boolean) -> Belief:
         """ Returns the belief from a sympy boolean. """
+        if isinstance(boolean, Belief):
+            return boolean
+
         if isinstance(boolean, Equivalent):
-            return Iff(Belief.from_sympy(boolean.args[0]), Belief.from_sympy(boolean.args[1]))
+            return reduce(lambda curr, next: Iff(Belief.from_sympy(curr), Belief.from_sympy(next)), boolean.args)
         elif isinstance(boolean, Implies):
             return If(Belief.from_sympy(boolean.args[0]), Belief.from_sympy(boolean.args[1]))
         elif isinstance(boolean, AndSympy):
-            return And(Belief.from_sympy(boolean.args[0]), Belief.from_sympy(boolean.args[1]))
+            return reduce(lambda curr, next: And(Belief.from_sympy(curr), Belief.from_sympy(next)), boolean.args)
         elif isinstance(boolean, OrSympy):
-            return Or(Belief.from_sympy(boolean.args[0]), Belief.from_sympy(boolean.args[1]))
+            return reduce(lambda curr, next: Or(Belief.from_sympy(curr), Belief.from_sympy(next)), boolean.args)
         elif isinstance(boolean, NotSympy):
             return Not(Belief.from_sympy(boolean.args[0]))
+        elif boolean == True:
+            return ValidClause()
         elif boolean == False:
             return EmptyClause()
         else:
@@ -37,6 +44,8 @@ class Belief:
             return OrSympy(self.left.to_sympy(), self.right.to_sympy())
         elif isinstance(self, Not):
             return NotSympy(self.belief.to_sympy())
+        elif isinstance(self, ValidClause):
+            return True
         elif isinstance(self, EmptyClause):
             return False
         else:
@@ -72,6 +81,29 @@ class Belief:
     def get_variables(self) -> set[str]:
         """ Returns the variables in the belief. """
         return {self.name}
+
+class ValidClause(Belief):
+    """ Represents a valid clause, i.e. a tautology. """
+
+    def __init__(self) -> None:
+        pass
+
+    def __str__(self) -> str:
+        return "⊤"
+    
+    def __eq__(self, other: object) -> bool:
+        return isinstance(other, ValidClause)
+    
+    def __hash__(self) -> int:
+        return hash(str(self))
+    
+    def evaluate(self, assignment: Assignment) -> bool:
+        """ Evaluates the belief given an assignment to variables. """
+        return True
+
+    def get_variables(self) -> set[str]:
+        """ Returns the variables in the belief. """
+        return set()
 
 class EmptyClause(Belief):
     """ Represents an empty clause, i.e. a contradiction. """
@@ -166,6 +198,9 @@ class Or(Belief):
 
     def evaluate(self, assignment: Assignment) -> bool:
         """ Evaluates the belief given an assignment to variables. """
+        if self.left.evaluate(assignment) == None and self.right.evaluate(assignment) == False or self.right.evaluate(assignment) == False and self.left.evaluate(assignment) == None:
+            return None
+
         return self.left.evaluate(assignment) or self.right.evaluate(assignment)
 
     def get_variables(self) -> set[str]:
@@ -234,15 +269,15 @@ def main():
     print(Not(a))
     print(Not(And(a, If(b, c))))
 
-    print("get_all_assignments:")
+    print("\nget_all_assignments:")
     for assignment in Assignment.get_all_assignments(a, b):
         print(assignment)
 
-    print("is_tautology:")
+    print("\nis_tautology:")
     print(Belief.is_tautology(And(a, Not(a))))
     print(Belief.is_tautology(Or(a, Not(a))))
 
-    print("get_variables:")
+    print("\nget_variables:")
     a_and_b = And(a, b)
     print(a_and_b)
     print(a_and_b.get_variables())
@@ -252,20 +287,17 @@ def main():
     print(not_b_and_a_or_d_if_c.get_variables())
     print(Or(a, not_b_and_a_or_d_if_c).get_variables())
 
-    print("to_sympy:")
+    print("\nto_sympy:")
     print(not_b_and_a_or_d_if_c)
     print(not_b_and_a_or_d_if_c.to_sympy())
     
-    print("from_sympy:")
+    print("\nfrom_sympy:")
     print(not_b_and_a_or_d_if_c)
     print(Belief.from_sympy(not_b_and_a_or_d_if_c.to_sympy()))
 
-    print("to_cnf:")
+    print("\nto_cnf:")
     print(not_b_and_a_or_d_if_c)
     print(not_b_and_a_or_d_if_c.to_cnf())
-
-    print("eq:")
-    print(And(Belief("a"), Belief("b")) in {And(Belief("b"), Belief("a"))})
 
     print()
 

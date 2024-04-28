@@ -36,6 +36,7 @@ class BeliefBaseContractionTests:
         """Tests if the outcomes of contracting with equivalent sentences are the same"""
 
         nothing = BeliefBase()
+
         if(nothing.entails(Iff(belief1, belief2))):
             assert(B.contract(belief1).beliefs == B.contract(belief2).beliefs)
     
@@ -112,6 +113,8 @@ def main() -> None:
     BeliefBaseRevisionTests.extensionality(Belief("A"), Belief("B"), B)
     BeliefBaseRevisionTests.superexpansion(Belief("A"), Belief("B"), B)
     BeliefBaseRevisionTests.subexpansion(Belief("A"), Belief("B"), B)
+    
+    print("All uncommented tests passed.")
 
 if __name__ == "__main__":
     main()
