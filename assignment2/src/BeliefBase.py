@@ -29,7 +29,7 @@ class BeliefBase:
         """ The rank of a belief b is defined by the largest rank i such that b entails 
          the base set of all beliefs of rank at least i """
         if Belief.is_tautology : return 1 # a tautology has order 1
-
+        # BeliefBase([]).entails(belief)
         beliefs = []
         ranked_beliefs = self.beliefs_by_rank()
         for rank in ranked_beliefs.keys:
@@ -51,10 +51,14 @@ class BeliefBase:
         return "{" + ", ".join([str(belief) for belief in self.beliefs]) + "}"
     
     def contract(self, belief : Belief) -> BeliefBase: 
-        """ Contracts the belief base by removing the belief from the belief base. """
-        #TODO base it on priority order
-        new_beliefs = self.beliefs.copy()
-        new_beliefs.remove(belief)
+        """ Implements entrenchment based contraction. """
+        new_beliefs = []
+        rank = belief.rank
+        for b in self.beliefs:
+            if b.rank > belief :
+                b_or_input = self.get_rank(Or(b,belief))
+                if b_or_input == belief.rank:
+                    new_beliefs.append(b.set_rank(rank))
         return BeliefBase(*new_beliefs)
     
     def expand(self,belief : Belief) -> BeliefBase:
