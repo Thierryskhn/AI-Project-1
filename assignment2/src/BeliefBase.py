@@ -52,6 +52,7 @@ class BeliefBase:
     
     def contract(self, belief : Belief) -> BeliefBase: 
         """ Implements entrenchment based contraction. """
+        if BeliefBase(*[]).entails(belief): return BeliefBase(*self.beliefs) #is a tautology
         new_beliefs = []
         rank = belief.rank
         for b in self.beliefs:
@@ -61,9 +62,21 @@ class BeliefBase:
                     new_beliefs.append(b.set_rank(rank))
         return BeliefBase(*new_beliefs)
     
-    def expand(self,belief : Belief) -> BeliefBase:
+    def expand(self,belief : Belief, new_rank: int) -> BeliefBase:
         #TODO based on priority order as well 
-        return self
+        if belief.check_rank(new_rank):
+            if not BeliefBase(*[]).entails(Not(belief)): return BeliefBase(*self.beliefs) #not consistent
+        if belief in self.beliefs and belief.rank < new_rank: BeliefBase(*self.beliefs) #lower rank
+        new_beliefs = list(self.beliefs.copy())
+        sorted(new_beliefs,reverse=True)
+        for i, b in enumerate(self.beliefs):
+            if Belief(*new_beliefs[0:i+1]).entails(belief):
+                if new_rank >= b.rank:
+                    new_beliefs.add(belief.set_rank(new_rank))
+                else:
+                    break
+
+        return BeliefBase(*new_rank)
     
     def add(self, belief : Belief) -> BeliefBase: 
         """ Expands the belief base by adding the belief to the belief base. """
@@ -72,11 +85,12 @@ class BeliefBase:
         return BeliefBase(*new_beliefs)
     
     
-    def revise(self, belief: Belief) -> BeliefBase:
+    def revise(self, belief: Belief,rank:int) -> BeliefBase:
         """ Revises the belief base by contracting the negative belief base and then expanding it with the new belief. """
-        new_beliefbase = BeliefBase(*self.beliefs)
-        new_beliefbase.contract(Not(belief),rank)
-        new_beliefbase.expand(belief,rank)
+        if belief.check_rank:
+            new_beliefbase = BeliefBase(*self.beliefs)
+            new_beliefbase.contract(Not(belief))
+            new_beliefbase.expand(belief,rank)
         return new_beliefbase
     
     ## TODO: keep?
