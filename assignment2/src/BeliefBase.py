@@ -26,7 +26,7 @@ class BeliefBase:
         if belief.get_rank != None:
             self.ranked_beliefs | {belief.rank,belief}
     
-    def get_rank(self,belief:Belief)->int:
+    def get_rank(self,belief:Belief) -> float:
         """ The rank of a belief b is defined by the largest rank i such that b entails 
             the base set of all beliefs of rank at least i """
         if Belief.is_tautology : return 1 # a tautology has order 1
@@ -39,7 +39,7 @@ class BeliefBase:
         return 0 
 
 
-    def update(self,belief: Belief, new_rank:int)-> None:
+    def update(self,belief: Belief, new_rank: float)-> None:
         if belief in self.beliefs :
             belief.set_rank(new_rank)
         else: self.beliefs.add(belief.set_rank(new_rank))
@@ -53,23 +53,37 @@ class BeliefBase:
     
     def contract(self, belief : Belief) -> BeliefBase: 
         """ Implements entrenchment based contraction. """
-        if not belief in self.beliefs:
-            return self
+        if belief not in self.beliefs:
+            return BeliefBase(*self.beliefs)
 
+        if BeliefBase(*[]).entails(belief):
+            return BeliefBase(*self.beliefs) #is a tautology
         new_beliefs = []
         rank = belief.rank
         for b in self.beliefs:
-            if b.rank > belief :
-                b_or_input = self.get_rank(Or(b,belief))
+            if b.rank and rank and b.rank > rank :
+                b_or_input = self.get_rank(Or(b,belief, max(b.rank, belief.rank)))
                 if b_or_input == belief.rank:
                     b.set_rank(rank)
                     new_beliefs.append(b)
         return BeliefBase(*new_beliefs)
     
-    def expand(self, belief: Belief) -> BeliefBase: 
-        """ Expands the belief base by adding the belief to the belief base. """
-        new_beliefs = self.beliefs.copy()
-        new_beliefs.add(belief)
+    def expand(self,belief : Belief, new_rank: float) -> BeliefBase:
+        if Belief.check_rank(new_rank):
+            if not BeliefBase(*[]).entails(Not(belief)):
+                return BeliefBase(*self.beliefs) #not consistent
+            
+        if belief in self.beliefs and belief.rank < new_rank: 
+            BeliefBase(*self.beliefs) #lower rank
+
+        new_beliefs = sorted(list(self.beliefs.copy()), reverse=True)
+        for i, b in enumerate(self.beliefs):
+            if BeliefBase(*new_beliefs[0:i+1]).entails(belief):
+                if new_rank >= b.rank:
+                    new_beliefs.append(belief.set_rank(new_rank))
+                else:
+                    break
+
         return BeliefBase(*new_beliefs)
     
     def add(self, belief : Belief) -> BeliefBase: 
@@ -77,12 +91,14 @@ class BeliefBase:
         new_beliefs = self.beliefs.copy()
         new_beliefs.add(belief)
         return BeliefBase(*new_beliefs)
-
-    def revise(self, belief: Belief,) -> BeliefBase:
+    
+    
+    def revise(self, belief: Belief, rank: float) -> BeliefBase:
         """ Revises the belief base by contracting the negative belief base and then expanding it with the new belief. """
-        new_beliefbase = BeliefBase(*self.beliefs)
-        new_beliefbase.contract(Not(belief,rank))
-        new_beliefbase.expand(belief,rank)
+        if Belief.check_rank(belief.rank):
+            new_beliefbase = BeliefBase(*self.beliefs)
+            new_beliefbase.contract(Not(belief))
+            new_beliefbase.expand(belief,rank)
         return new_beliefbase
 
     def to_cnf_list(self) -> list[list[Belief]]:
@@ -153,7 +169,9 @@ class BeliefBase:
         """ Checks if the belief follows from the belief base using the DPLL algorithm.
             Week 10: Testing entailment φ |= ψ, is done by testing unsatisfiability of φ ∧ ¬ψ
         """
-        return BeliefBase._dpll_satisfiable(self.expand(Not(belief))) == False
+        not_belief = Not(belief)
+
+        return BeliefBase._dpll_satisfiable(self.add(not_belief)) == False
 
     def _dpll_satisfiable(base: BeliefBase) -> bool:
         clauses = base.to_cnf_list()
@@ -228,7 +246,7 @@ def cnf_tests():
     belief_base = BeliefBase(a, b, a_or_b,d)
     print(belief_base.beliefs_by_rank())
     print(belief_base)
-    belief_base = belief_base.expand(d)
+    belief_base = belief_base.expand(d, 0.5)
     print(belief_base)
     belief_base = belief_base.contract(a)
     print(belief_base)

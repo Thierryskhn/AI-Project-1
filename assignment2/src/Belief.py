@@ -59,7 +59,7 @@ class Belief:
         """ Returns whether the belief is a tautology, i.e. it is true for all possible assignments. """
         return all(belief.evaluate(assignment) for assignment in Assignment.get_all_assignments(*belief.get_variables()))
 
-    def __init__(self, name: str, rank: int = None):
+    def __init__(self, name: str, rank: float = None):
         self.name = name
         self.rank = rank
 
@@ -91,13 +91,15 @@ class Belief:
         """ Returns the variables in the belief. """
         return {self.name}
     
-    def set_rank(self, rank: int)-> None : 
+    def set_rank(self, rank: float)-> None : 
         """ Sets the rank of the belief, raises a Type Error if not correct"""
-        if not self.check_rank(rank): raise TypeError("Incorrect rank given")
+        if not Belief.check_rank(rank): raise TypeError("Incorrect rank given")
         self.rank = rank
 
-    def check_rank(self,rank:int) -> Boolean:
-        """Checks if the given rank is between 0 and 1 an error is raised"""
+    def check_rank(rank: float) -> Boolean:
+        """Checks if the given rank is between 0 and 1"""
+        if not isinstance(rank, float): return False
+
         return 0 <= rank <= 1
     
 
@@ -153,9 +155,12 @@ class EmptyClause(Belief):
 class Not(Belief):
     """ Represents the negation of a belief's proposition.  """
 
-    def __init__(self, belief: Belief, rank: int = None) -> None:
+    def __init__(self, belief: Belief, rank: float = None) -> None:
         self.belief = belief
         self.rank = rank 
+
+        if self.rank == None and Belief.check_rank(belief.rank): 
+            self.rank = 1 - belief.rank
 
     def __str__(self) -> str:
         return "¬" + str(self.belief)
@@ -179,7 +184,7 @@ class Not(Belief):
 
 class And(Belief):
     """ Represents the conjunction of two beliefs' proposition. """
-    def __init__(self, left: Belief, right: Belief, rank: int = None) -> None:
+    def __init__(self, left: Belief, right: Belief, rank: float = None) -> None:
         self.left = left
         self.right = right
         self.rank = rank
@@ -207,7 +212,7 @@ class And(Belief):
 class Or(Belief):
     """ Represents the disjunction of two beliefs' proposition. """
 
-    def __init__(self, left: Belief, right: Belief, rank: int = None) -> None:
+    def __init__(self, left: Belief, right: Belief, rank: float = None) -> None:
         self.left = left
         self.right = right
         self.rank = rank
@@ -235,7 +240,7 @@ class Or(Belief):
 class If(Belief):
     """ Represents the implication of two beliefs' proposition. """
 
-    def __init__(self, left: Belief, right: Belief, rank: int = None) -> None:
+    def __init__(self, left: Belief, right: Belief, rank: float = None) -> None:
         self.left = left
         self.right = right
         self.rank = rank
@@ -260,7 +265,7 @@ class If(Belief):
 class Iff(Belief):
     """ Represents the biconditional of two beliefs' proposition. """
     
-    def __init__(self, left: Belief, right: Belief, rank: int = None) -> None:
+    def __init__(self, left: Belief, right: Belief, rank: float = None) -> None:
         self.left = left
         self.right = right
         self.rank = rank

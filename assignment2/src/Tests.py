@@ -40,8 +40,13 @@ class BeliefBaseContractionTests:
     
     def recovery(belief: Belief, B: BeliefBase):
         """Contraction leads to the loss of as few previous beliefs as possible""" 
-        #TODO just check in which way it works and it's cool
-        assert(B.beliefs.issubset(B.contract(belief).expand(belief).beliefs))
+        print("Recovery test")
+        print(belief)
+        print(B.beliefs)
+        print([belief.rank for belief in B.beliefs])
+        print(B.contract(belief))
+        print(B.contract(belief).expand(belief, belief.rank).beliefs)
+        assert(B.beliefs.issubset(B.contract(belief).expand(belief, belief.rank).beliefs))
 
     def conjunctive_inclusion(belief1: Belief, belief2: Belief, B: BeliefBase):
         """Tests the conjunctive inclusion property""" 
