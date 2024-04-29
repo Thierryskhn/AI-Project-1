@@ -8,8 +8,7 @@ class BeliefBase:
     """ Represents a belief base. """
     
     def __init__(self, *beliefs: Belief) -> None:
-        self.beliefs = set(beliefs)
-        
+        self.beliefs = {x for x in set(beliefs ) if x is not None}
 
     def beliefs_by_rank(self)-> dict:
         """
@@ -22,21 +21,6 @@ class BeliefBase:
                 rank_dict[belief.rank].append(belief)
         return dict(sorted(rank_dict.items(), reverse=True))
     
-    def add_ranked_beliefs(self,belief:Belief)->None:
-        if belief.get_rank != None:
-            self.ranked_beliefs | {belief.rank,belief}
-    
-    def get_rank(self,belief:Belief) -> float:
-        """ The rank of a belief b is defined by the largest rank i such that b entails 
-            the base set of all beliefs of rank at least i """
-        if Belief.is_tautology : return 1 # a tautology has order 1
-        # BeliefBase([]).entails(belief)
-        beliefs = []
-        ranked_beliefs = self.beliefs_by_rank()
-        for rank in ranked_beliefs.keys:
-            beliefs += ranked_beliefs.get(rank)
-            if BeliefBase(*beliefs).entails(belief): return rank
-        return 0 
 
 
     def update(self,belief: Belief, new_rank: float)-> None:
@@ -51,38 +35,44 @@ class BeliefBase:
     def __str__(self) -> str:
         return "{" + ", ".join([str(belief) for belief in self.beliefs]) + "}"
     
-    def contract(self, belief : Belief) -> BeliefBase: 
-        """ Implements entrenchment based contraction. """
+    
+    def contract(self, belief : Belief) -> BeliefBase:
+        """ Implements priority  based contraction. """
         if belief not in self.beliefs:
-            return BeliefBase(*self.beliefs)
-
+            return BeliefBase(*self.beliefs) 
+        
         if BeliefBase(*[]).entails(belief):
             return BeliefBase(*self.beliefs) #is a tautology
-        new_beliefs = []
-        rank = belief.rank
-        for b in self.beliefs:
-            if b.rank and rank and b.rank > rank :
-                b_or_input = self.get_rank(Or(b,belief, max(b.rank, belief.rank)))
-                if b_or_input == belief.rank:
-                    b.set_rank(rank)
-                    new_beliefs.append(b)
-        return BeliefBase(*new_beliefs)
-    
+        
+        new_beliefs = sorted(list(self.beliefs.copy()),reverse=True)
+        not_consistent = []
+        for i, b in enumerate(new_beliefs):
+            if b == None : break
+            if BeliefBase(*new_beliefs[0:i+1]).entails(belief) and belief.rank > b.rank:
+                not_consistent.append(belief)
+
+        belief_base = self.beliefs - set(not_consistent)
+        return BeliefBase(*belief_base)
+
     def expand(self,belief : Belief, new_rank: float) -> BeliefBase:
-        if Belief.check_rank(new_rank):
-            if not BeliefBase(*[]).entails(Not(belief)):
-                return BeliefBase(*self.beliefs) #not consistent
+        """ Expansion of the belief base, makes sure that it stays consistent. """
+        if not Belief.check_rank(new_rank): 
+            print("incorrect rank")
+            return BeliefBase(*self.beliefs)
             
         if belief in self.beliefs and belief.rank < new_rank: 
             BeliefBase(*self.beliefs) #lower rank
 
         new_beliefs = sorted(list(self.beliefs.copy()), reverse=True)
-        for i, b in enumerate(self.beliefs):
+        print(new_beliefs)
+        for i, b in enumerate(new_beliefs):
+            if b == None : break
             if BeliefBase(*new_beliefs[0:i+1]).entails(belief):
-                if new_rank >= b.rank:
-                    new_beliefs.append(belief.set_rank(new_rank))
+                if belief.rank >= b.rank:
+                    b = belief.set_rank(new_rank)
+                    new_beliefs.append(b)
                 else:
-                    break
+                 break
 
         return BeliefBase(*new_beliefs)
     
@@ -95,10 +85,12 @@ class BeliefBase:
     
     def revise(self, belief: Belief, rank: float) -> BeliefBase:
         """ Revises the belief base by contracting the negative belief base and then expanding it with the new belief. """
-        if Belief.check_rank(belief.rank):
-            new_beliefbase = BeliefBase(*self.beliefs)
-            new_beliefbase.contract(Not(belief))
-            new_beliefbase.expand(belief,rank)
+        if not Belief.check_rank(belief.rank): 
+            print("incorrect rank")
+            return BeliefBase(*self.beliefs)
+        new_beliefbase = BeliefBase(*self.beliefs)
+        new_beliefbase = new_beliefbase.contract(Not(belief))
+        new_beliefbase = new_beliefbase.expand(belief,rank)
         return new_beliefbase
 
     def to_cnf_list(self) -> list[list[Belief]]:
