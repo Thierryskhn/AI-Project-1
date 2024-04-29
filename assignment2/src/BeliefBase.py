@@ -1,4 +1,5 @@
-from __future__ import annotations # For type hints in class methods
+from __future__ import annotations
+from collections import defaultdict # For type hints in class methods
 from Belief import Belief, Not, And, Or, If, Iff, EmptyClause
 from Assignment import Assignment
 from functools import reduce
@@ -8,6 +9,40 @@ class BeliefBase:
     
     def __init__(self, *beliefs: Belief) -> None:
         self.beliefs = set(beliefs)
+        
+
+    def beliefs_by_rank(self)-> dict:
+        """
+        Transforms the beliefs of the belief base into a dictionary with ranks as keys
+        and lists of beliefs with the same rank as values.
+        """
+        rank_dict = defaultdict(list)
+        for belief in self.beliefs:
+            if(not belief.rank == None):
+                rank_dict[belief.rank].append(belief)
+        return dict(sorted(rank_dict.items(), reverse=True))
+    
+    def add_ranked_beliefs(self,belief:Belief)->None:
+        if belief.get_rank != None:
+            self.ranked_beliefs | {belief.rank,belief}
+    
+    def get_rank(self,belief:Belief)->int:
+        """ The rank of a belief b is defined by the largest rank i such that b entails 
+            the base set of all beliefs of rank at least i """
+        if Belief.is_tautology : return 1 # a tautology has order 1
+        # BeliefBase([]).entails(belief)
+        beliefs = []
+        ranked_beliefs = self.beliefs_by_rank()
+        for rank in ranked_beliefs.keys:
+            beliefs += ranked_beliefs.get(rank)
+            if BeliefBase(*beliefs).entails(belief): return rank
+        return 0 
+
+
+    def update(self,belief: Belief, new_rank:int)-> None:
+        if belief in self.beliefs :
+            belief.set_rank(new_rank)
+        else: self.beliefs.add(belief.set_rank(new_rank))
 
     def get_beliefs(self) -> set:
         """ Returns the beliefs in the belief base. """
@@ -17,25 +52,37 @@ class BeliefBase:
         return "{" + ", ".join([str(belief) for belief in self.beliefs]) + "}"
     
     def contract(self, belief : Belief) -> BeliefBase: 
-        """ Contracts the belief base by removing the belief from the belief base. """
+        """ Implements entrenchment based contraction. """
         if not belief in self.beliefs:
             return self
 
-        new_beliefs = self.beliefs.copy()
-        new_beliefs.remove(belief)
+        new_beliefs = []
+        rank = belief.rank
+        for b in self.beliefs:
+            if b.rank > belief :
+                b_or_input = self.get_rank(Or(b,belief))
+                if b_or_input == belief.rank:
+                    b.set_rank(rank)
+                    new_beliefs.append(b)
         return BeliefBase(*new_beliefs)
     
-    def expand(self, belief : Belief) -> BeliefBase: 
+    def expand(self, belief: Belief) -> BeliefBase: 
+        """ Expands the belief base by adding the belief to the belief base. """
+        new_beliefs = self.beliefs.copy()
+        new_beliefs.add(belief)
+        return BeliefBase(*new_beliefs)
+    
+    def add(self, belief : Belief) -> BeliefBase: 
         """ Expands the belief base by adding the belief to the belief base. """
         new_beliefs = self.beliefs.copy()
         new_beliefs.add(belief)
         return BeliefBase(*new_beliefs)
 
-    def revise(self, belief: Belief) -> BeliefBase:
+    def revise(self, belief: Belief,) -> BeliefBase:
         """ Revises the belief base by contracting the negative belief base and then expanding it with the new belief. """
         new_beliefbase = BeliefBase(*self.beliefs)
-        new_beliefbase.contract(Not(belief))
-        new_beliefbase.expand(belief)
+        new_beliefbase.contract(Not(belief,rank))
+        new_beliefbase.expand(belief,rank)
         return new_beliefbase
 
     def to_cnf_list(self) -> list[list[Belief]]:
@@ -174,11 +221,12 @@ def cnf_tests():
 
     print("\nCNF tests:")
 
-    a = Belief("a")
-    b = Belief("b")
-    a_or_b = Or(a, b)
-    d = Belief("d")
-    belief_base = BeliefBase(a, b, a_or_b)
+    a = Belief("a",0.5)
+    b = Belief("b",0.4)
+    a_or_b = Or(a, b,0.5)
+    d = Belief("d",0.6)
+    belief_base = BeliefBase(a, b, a_or_b,d)
+    print(belief_base.beliefs_by_rank())
     print(belief_base)
     belief_base = belief_base.expand(d)
     print(belief_base)
